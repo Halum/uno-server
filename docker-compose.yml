@@ -10,7 +10,7 @@ services:
       environment:
         NODE_ENV: development
       ports:
-        - 3000:3500
+        - 3500:3500
       command: npm run dev
   mongo:
       image: mongo
