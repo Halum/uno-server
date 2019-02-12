@@ -1,0 +1,33 @@
+{
+  "name": "uno-server",
+  "version": "0.0.1",
+  "description": "This is a express server to serve as uno game back-end",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Halum/uno-server.git"
+  },
+  "keywords": [
+    "uno",
+    "mongo",
+    "express",
+    "game"
+  ],
+  "author": {
+    "name": "Sajjad Hossain",
+    "email": "my.lost.word@gmail.com"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Halum/uno-server/issues"
+  },
+  "homepage": "https://github.com/Halum/uno-server#readme",
+  "dependencies": {
+    "express": "latest",
+    "nodemon": "latest"
+  }
+}
