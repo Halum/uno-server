@@ -12,15 +12,21 @@ class GameService {
   }
 
   addPlayer(gameId, playerId) {
-    return db.getGame(gameId)
-      .then(game => {
+    let promises = [
+      db.getGame(gameId),
+      db.getPlayer(playerId)
+    ];
+    return Promise
+      .all(promises)
+      .then(data => {
+        let [game, player] = data;
+
         if(game.status !== 'waiting') return Promise.reject('Game already running');
 
         game.players.push(playerId);
         return game;
       })
-      .then(game => db.updateGame(game))
-      .catch(console.error);
+      .then(game => db.updateGame(game));
   }
 
   start(gameId) {

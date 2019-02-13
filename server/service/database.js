@@ -25,7 +25,7 @@ class Database {
       }
     }
 
-    return Promise.reject();
+    return Promise.reject('Player not found');
   }
 
   get _id() {

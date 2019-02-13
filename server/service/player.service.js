@@ -8,6 +8,7 @@ class PlayerService{
 
   getPlayers(playerIds) {
     let playerPromises = [];
+    
     for(let playerId of playerIds) {
       playerPromises.push(db.getPlayer(playerId));
     }
