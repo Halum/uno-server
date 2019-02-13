@@ -29,6 +29,7 @@
   "homepage": "https://github.com/Halum/uno-server#readme",
   "dependencies": {
     "express": "latest",
-    "nodemon": "latest"
+    "nodemon": "latest",
+    "randomstring": "^1.1.5"
   }
 }
