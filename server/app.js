@@ -1,10 +1,9 @@
-const config = require('./config/config.js');
 const express = require('express');
-const http = require('http')
-const unoRouter = require('./uno')
+const unoRouter = require('./uno/uno.router');
 
 const app = express();
 
+app.use(express.json());
 app.use('/uno/', unoRouter);
 
 module.exports = app;
