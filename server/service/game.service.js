@@ -11,10 +11,14 @@ class GameService {
     return db.createGame();
   }
 
+  getGame(gameId) {
+    return db.getGame(gameId);
+  }
+
   addPlayer(gameId, playerId) {
     let promises = [
-      db.getGame(gameId),
-      db.getPlayer(playerId)
+      this.getGame(gameId),
+      playerService.getPlayer(playerId)
     ];
     return Promise
       .all(promises)
@@ -29,19 +33,13 @@ class GameService {
       .then(game => db.updateGame(game));
   }
 
-  start(gameId) {
-    return db.getGame(gameId)
-      .then(game => {
-        return playerService.getPlayers(game.players);
-      })
-      .then(players => {
-        let readyPlayers = players.filter(player => player.status === 'ready');
-        if(players.length && players.length === readyPlayers.length) {
-          Object.assign(game, {status: 'running'});
-          return db.updateGame(game);
-        }
-        return Promise.reject();
-      })
+  startGame(gameId, players) {
+    let updates = {
+      status: 'running',
+      currentPlayer: players[0].id
+    };
+
+    return db.updateGameById(gameId, updates);
   }
 };
 

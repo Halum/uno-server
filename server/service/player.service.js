@@ -6,6 +6,10 @@ class PlayerService{
     return db.createPlayer(playerName);
   }
 
+  getPlayer(playerId) {
+    return db.getPlayer(playerId);
+  }
+
   getPlayers(playerIds) {
     let playerPromises = [];
     
@@ -14,6 +18,23 @@ class PlayerService{
     }
 
     return Promise.all(playerPromises);
+  }
+
+  updatePlayersAsPlaying(playerIds) {
+    let promises = [];
+    let updates = {status: 'playing'};
+
+    for(let playerId of playerIds) {
+      promises.push(db.updatePlayerById(playerId, updates));
+    }
+
+    return Promise.all(promises);
+  }
+
+  updatePlayerAsReady(playerId) {
+    let updates = {status: 'ready'};
+
+    return db.updatePlayerById(playerId, updates);
   }
 }
 
