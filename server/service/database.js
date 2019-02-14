@@ -76,7 +76,7 @@ class Database {
       }
     }
     
-    return Promise.resolve();
+    return Promise.resolve(player);
   }
 
 };
