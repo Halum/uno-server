@@ -34,11 +34,12 @@ class Database {
 
   createGame() {
     let newProperties = {
-      id: this._id,
+      id: '12345',//this._id, // TODO
       status: 'waiting'
     };
     let newGame = Object.assign({}, dbStructure.game, newProperties);
-
+    // TODO remove this, as it will always create a single game
+    if(this.games.length) return Promise.resolve(this.games[0]);
     this.games.push(newGame);
     return Promise.resolve(newGame);
   }
