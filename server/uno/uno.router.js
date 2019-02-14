@@ -14,10 +14,6 @@ unoRouter
   .post(unoController.joinGame);
 
 unoRouter
-  .route('/start')
-  .post(unoController.startGame);
-
-unoRouter
   .route('/player/ready')
   .post(unoController.playerReady);
 

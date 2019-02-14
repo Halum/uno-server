@@ -3,6 +3,11 @@ const playerService = require('./../service/player.service');
 const socketService = require('./../service/socket.service');
 
 class UnoController {
+  constructor() {
+    this.playerReady = this.playerReady.bind(this);
+    this.startGame = this.startGame.bind(this);
+  }
+
   createNewGame(req, res) {
     gameService
       .createNewGame()
@@ -31,37 +36,34 @@ class UnoController {
       .catch(error => res.status(400).send({error}));
   }
 
-  startGame(req, res) {
-    let {gameId} = req.body;
-    let game = null;
-
-    gameService
+  startGame(gameId) {
+    return gameService
       .getGame(gameId)
-      .then(data => {
-        game = data;
-        return playerService.getPlayers(game.players);
-      })
-      .then(players => {
-        if(players.every(player => player.status === 'ready')) {
-          let promises = [
-            playerService.updatePlayersAsPlaying(game.players),
-            gameService.startGame(gameId, players)
-          ];
+      .then(game => {
+        let promises = [
+          playerService.updatePlayersAsPlaying(game.players),
+          gameService.startGame(gameId, game.players)
+        ];
 
-          return Promise.all(promises);
-        }
-        return Promise.reject('Some players are not ready');
+        return Promise.all(promises);
       })
-      .then(([players, game]) => res.send(game))
-      .catch(error => res.status(400).send({error}));
+      .then(() => gameService.startCountDown(gameId));
   }
 
   playerReady(req, res) {
-    let {playerId} = req.body;
+    let {gameId, playerId} = req.body;
 
     playerService
       .updatePlayerAsReady(playerId)
-      .then(player => res.send(player))
+      .then(player => {
+        return gameService
+          .checkIfALlPlayerReady(gameId)
+          .then(() => this.startGame(gameId))
+          .catch(console.error)
+          .then(() => {
+            res.send(player);
+          });
+      })
       .catch(error => res.status(400).send({error}));
 
   }

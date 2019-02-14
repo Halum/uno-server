@@ -1,5 +1,6 @@
 const db = require('./database');
 const playerService = require('./player.service');
+const socketService = require('./socket.service');
 
 
 class GameService {
@@ -40,6 +41,30 @@ class GameService {
     };
 
     return db.updateGameById(gameId, updates);
+  }
+
+  checkIfALlPlayerReady(gameId) {
+    return this
+      .getGame(gameId)
+      .then(game => {
+        return playerService.getPlayers(game.players);
+      })
+      .then(players => {
+        if(players.length > 1 && players.every(player => player.status === 'ready')) {
+          return Promise.resolve()
+        }
+        return Promise.reject('Some players are not ready');
+      })
+  }
+
+  startCountDown(gameId) {
+    let count = 5;
+    let channel = 'count-down';
+
+    let intervalTimer = setInterval(()=>{
+      socketService.broadcast(gameId, channel, count--);
+      if(count === 0) clearInterval(intervalTimer);
+    }, 900);
   }
 };
 

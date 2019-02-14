@@ -13,7 +13,7 @@
 
 const url = 'http://localhost:3500/uno';
 let game = null;
-let players = [];
+let player = null;
 let socket = null;
 
 demo();
@@ -24,38 +24,23 @@ function demo() {
       game = data;
       console.log('Game created', game);
 
-      return Promise.all([
-        createPlayer('ab'),
-        createPlayer('xy')
-      ]);
+      return createPlayer(makeId(5));
     })
     .then(data => {
-      players = data;
-      console.log('Players created', players);
+      player = data;
+      console.log('Player created', player);
       
-      let promises = [];
-
-      for(let player of players) {
-        promises.push(joinGame(game.id, player.id));
-      }
-
-      return Promise.all(promises);
+      return joinGame(game.id, player.id);
     })
     .then(data => {
-      console.log('Players joined', data);
+      console.log('Player joined', data);
       connectSocket(game.id);
       
-      let promises = [];
-
-      for(let player of players) {
-        promises.push(playerReady(player.id));
-      }
-
-      return Promise.all(promises);
+      return playerReady(game.id, player.id);
     })
     .then(data => {
-      players = data;
-      console.log('Players ready', players);
+      player = data;
+      console.log('Player ready', player);
     });
 }
 
@@ -64,6 +49,7 @@ function connectSocket(gameId) {
   socket = io(`/${gameId}`);
 
   socket.on(gameId, console.log);
+  socket.on('count-down', console.log);
 }
 
 function post(path, data) {
@@ -95,11 +81,21 @@ function joinGame(gameId, playerId) {
   return post(path, data);
 }
 
-function playerReady(playerId) {
+function playerReady(gameId, playerId) {
   const path = '/player/ready';
-  const data = {playerId};
+  const data = {gameId, playerId};
 
   return post(path, data);
+}
+
+function makeId(len) {
+  var text = "";
+  var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+  for (var i = 0; i < len; i++)
+    text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+  return text;
 }
 
 </script>

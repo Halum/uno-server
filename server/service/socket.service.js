@@ -13,6 +13,8 @@ class SocketService {
   }
 
   manageGame(gameId) {
+    if(this.namespaces[gameId]) return;
+
     const gameNamespace = this.socketServer.of(gameId);
     this.namespaces[gameId] = gameNamespace;
 
@@ -23,10 +25,10 @@ class SocketService {
     });
   }
 
-  broadcast(gameId, data) {
+  broadcast(gameId, channel, data) {
     const gameNamespace = this.namespaces[gameId];
 
-    gameNamespace.emit(gameId, data);
+    gameNamespace.emit(channel, data);
   }
 };
 
