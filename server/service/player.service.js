@@ -32,13 +32,9 @@ class PlayerService{
   }
 
   updatePlayerAsReady(playerId) {
-    return this
-      .getPlayer(playerId)
-      .then(player => {
-        player.status = 'ready';
+    let updates = {status: 'ready'};
 
-        return db.updatePlayer(player);
-      });
+    return db.updatePlayerById(playerId, updates);
   }
 }
 

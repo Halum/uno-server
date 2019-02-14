@@ -89,18 +89,6 @@ class Database {
 
     return Promise.reject('Game not found');
   }
-
-  updatePlayer(player) {
-    for(let i=0; i<this.players.length; ++i) {
-      if(this.players[i].id == player.id) {
-        this.players[i] = player;
-        return Promise.resolve(player);
-      }
-    }
-    
-    return Promise.reject('Player not found');
-  }
-
 };
 
 module.exports = new Database();

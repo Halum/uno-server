@@ -33,8 +33,11 @@ class GameService {
       .then(game => db.updateGame(game));
   }
 
-  startGame(gameId) {
-    let updates = {status: 'running'};
+  startGame(gameId, players) {
+    let updates = {
+      status: 'running',
+      currentPlayer: players[0].id
+    };
 
     return db.updateGameById(gameId, updates);
   }

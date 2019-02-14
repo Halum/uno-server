@@ -41,7 +41,7 @@ class UnoController {
         if(players.every(player => player.status === 'ready')) {
           let promises = [
             playerService.updatePlayersAsPlaying(game.players),
-            gameService.startGame(gameId)
+            gameService.startGame(gameId, players)
           ];
 
           return Promise.all(promises);
