@@ -4,7 +4,8 @@
   "description": "This is a express server to serve as uno game back-end",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon index.js",
+    "dev": "nodemon -L index.js",
+    "start": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -28,6 +29,8 @@
   "homepage": "https://github.com/Halum/uno-server#readme",
   "dependencies": {
     "express": "latest",
-    "nodemon": "latest"
+    "nodemon": "latest",
+    "randomstring": "^1.1.5",
+    "socket.io": "2.2.0"
   }
 }

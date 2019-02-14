@@ -1,0 +1,104 @@
+
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Socket.IO - Demo</title>
+</head>
+<body>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js"></script>
+<script>
+
+const url = 'http://localhost:3500/uno';
+let game = null;
+let player = null;
+let socket = null;
+
+demo();
+
+function demo() {
+  createGame()
+    .then(data => {
+      game = data;
+      console.log('Game created', game);
+
+      return createPlayer(makeId(5));
+    })
+    .then(data => {
+      player = data;
+      console.log('Player created', player);
+      
+      return joinGame(game.id, player.id);
+    })
+    .then(data => {
+      console.log('Player joined', data);
+      connectSocket(game.id);
+      
+      return playerReady(game.id, player.id);
+    })
+    .then(data => {
+      player = data;
+      console.log('Player ready', player);
+    });
+}
+
+function connectSocket(gameId) {
+  console.log('connecting to socket', gameId);
+  socket = io(`/${gameId}`);
+
+  socket.on(gameId, console.log);
+  socket.on('count-down', console.log);
+}
+
+function post(path, data) {
+  return fetch(url+path, {
+    method: 'POST',
+    body: JSON.stringify(data),
+    headers:{'Content-Type': 'application/json'}
+  })
+  .then(res => res.json());
+}
+
+function createGame() {
+  const path = '/new';
+
+  return post(path, {});
+}
+
+function createPlayer(playerName) {
+  const path = '/players/new';
+  const data = {playerName};
+
+  return post(path, data);
+}
+
+function joinGame(gameId, playerId) {
+  const path = '/join';
+  const data = {gameId, playerId};
+
+  return post(path, data);
+}
+
+function playerReady(gameId, playerId) {
+  const path = '/player/ready';
+  const data = {gameId, playerId};
+
+  return post(path, data);
+}
+
+function makeId(len) {
+  var text = "";
+  var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+  for (var i = 0; i < len; i++)
+    text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+  return text;
+}
+
+</script>
+
+</body>
+</html>

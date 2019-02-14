@@ -1,6 +1,7 @@
 const app = require('./server/app');
 const config = require('./server/config/config');
-const http = require('http')
+const http = require('http');
+const socketService = require('./server/service/socket.service');
 
 const server = http.createServer(app);
 const port = config.server.port;
@@ -28,6 +29,7 @@ const onListen = () => {
   console.log(`server is listening on ${msg}`);
 }
 
+socketService.init(server);
 server.listen(port);
 server.on('error', onError);
 server.on('listening', onListen);
