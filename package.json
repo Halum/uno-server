@@ -30,6 +30,7 @@
   "dependencies": {
     "express": "latest",
     "nodemon": "latest",
-    "randomstring": "^1.1.5"
+    "randomstring": "^1.1.5",
+    "socket.io": "2.2.0"
   }
 }

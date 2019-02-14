@@ -1,9 +1,12 @@
 const app = require('./server/app');
 const config = require('./server/config/config');
-const http = require('http')
+const http = require('http');
+const socketService = require('./server/service/socket.service');
+// const io = require('socket.io');
 
 const server = http.createServer(app);
 const port = config.server.port;
+// const scoketIo = io(server);
 
 const onError = (error)=> {
   if(error.syscall !== 'listen') throw error;
@@ -28,6 +31,20 @@ const onListen = () => {
   console.log(`server is listening on ${msg}`);
 }
 
+// scoketIo.on('connection', socket => {
+//   console.log('a user connected');
+//   socket.on('disconnect', function(){
+//     console.log('user disconnected');
+//   });
+
+//   socket.on('test', console.log);
+// });
+
+// scoketIo.on('test', msg => {
+//   console.log(msg);
+// });
+
+socketService.init(server);
 server.listen(port);
 server.on('error', onError);
 server.on('listening', onListen);
