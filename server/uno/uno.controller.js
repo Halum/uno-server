@@ -6,7 +6,7 @@ class UnoController {
     gameService
       .createNewGame()
       .then(game => res.send(game))
-      .catch(error => res.status(4000).send({error}));;
+      .catch(error => res.status(400).send({error}));
   }
 
   createNewPlayer(req, res) {
@@ -15,7 +15,7 @@ class UnoController {
     playerService
       .createNewPlayer(playerName)
       .then(player => res.send(player))
-      .catch(error => res.status(4000).send({error}));;
+      .catch(error => res.status(400).send({error}));
   }
 
   joinGame(req, res) {
@@ -24,7 +24,7 @@ class UnoController {
     gameService
       .addPlayer(gameId, playerId)
       .then(game => res.send(game))
-      .catch(error => res.status(4000).send({error}));;
+      .catch(error => res.status(400).send({error}));
   }
 
   startGame(req, res) {
