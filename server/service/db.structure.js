@@ -1,7 +1,7 @@
 const dbStructure = {
   game: {
     id: "",
-    palyers: [],
+    players: [],
     currentPlayer: "",
     direction: 1,
     status: "waiting|running|complete",

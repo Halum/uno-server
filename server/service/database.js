@@ -15,7 +15,7 @@ class Database {
       }
     }
 
-    return Promise.reject();
+    return Promise.reject('Game not found');
   }
 
   getPlayer(playerId) {
@@ -25,7 +25,7 @@ class Database {
       }
     }
 
-    return Promise.reject();
+    return Promise.reject('Player not found');
   }
 
   get _id() {
@@ -40,7 +40,6 @@ class Database {
     let newGame = Object.assign({}, dbStructure.game, newProperties);
 
     this.games.push(newGame);
-
     return Promise.resolve(newGame);
   }
 
@@ -66,7 +65,7 @@ class Database {
       }
     }
 
-    return Promise.resolve();
+    return Promise.resolve(game);
   }
 
   updatePlayer(player) {

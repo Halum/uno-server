@@ -1,21 +1,38 @@
+const gameService = require('./../service/game.service');
+const playerService = require('./../service/player.service');
+
 class UnoController {
-  createNewGame() {
+  createNewGame(req, res) {
+    gameService
+      .createNewGame()
+      .then(game => res.send(game));
+  }
+
+  createNewPlayer(req, res) {
+    let playerName = req.body.playerName;
+
+    playerService
+      .createNewPlayer(playerName)
+      .then(player => res.send(player));
+  }
+
+  joinGame(req, res) {
+    let {gameId, playerId} = req.body;
+
+    gameService
+      .addPlayer(gameId, playerId)
+      .then(game => res.send(game));
+  }
+
+  playerReady(req, res) {
 
   }
 
-  joinGame() {
+  playerSkip(req, res) {
 
   }
 
-  playerReady() {
-
-  }
-
-  playerSkip() {
-
-  }
-
-  playerMove() {
+  playerMove(req, res) {
     
   }
 };

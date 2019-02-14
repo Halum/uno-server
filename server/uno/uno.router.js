@@ -6,7 +6,11 @@ unoRouter
   .post(unoController.createNewGame);
 
 unoRouter
-  .route(':gameId/join')
+  .route('/players/new')
+  .post(unoController.createNewPlayer);
+
+unoRouter
+  .route('/join')
   .post(unoController.joinGame);
 
 unoRouter
