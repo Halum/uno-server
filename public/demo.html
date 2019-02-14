@@ -1,0 +1,100 @@
+
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Socket.IO - Demo</title>
+</head>
+<body>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js"></script>
+<script>
+
+const url = 'http://localhost:3500/uno';
+
+demo();
+
+function demo() {
+  let game = null;
+  let players = [];
+
+  createGame()
+    .then(data => {
+      game = data;
+      console.log('Game created', game);
+
+      return Promise.all([
+        createPlayer('ab'),
+        createPlayer('xy')
+      ]);
+    })
+    .then(data => {
+      players = data;
+      console.log('Players created', players);
+      
+      let promises = [];
+
+      for(let player of players) {
+        promises.push(joinGame(game.id, player.id));
+      }
+
+      return Promise.all(promises);
+    })
+    .then(data => {
+      console.log('Players joined', data);
+      
+      let promises = [];
+
+      for(let player of players) {
+        promises.push(playerReady(player.id));
+      }
+
+      return Promise.all(promises);
+    })
+    .then(data => {
+      players = data;
+      console.log('Players ready', players);
+    });
+}
+
+function post(path, data) {
+  return fetch(url+path, {
+    method: 'POST',
+    body: JSON.stringify(data),
+    headers:{'Content-Type': 'application/json'}
+  })
+  .then(res => res.json());
+}
+
+function createGame() {
+  const path = '/new';
+
+  return post(path, {});
+}
+
+function createPlayer(playerName) {
+  const path = '/players/new';
+  const data = {playerName};
+
+  return post(path, data);
+}
+
+function joinGame(gameId, playerId) {
+  const path = '/join';
+  const data = {gameId, playerId};
+
+  return post(path, data);
+}
+
+function playerReady(playerId) {
+  const path = '/player/ready';
+  const data = {playerId};
+
+  return post(path, data);
+}
+
+</script>
+
+</body>
+</html>
