@@ -18,7 +18,7 @@ class GameService {
   addPlayer(gameId, playerId) {
     let promises = [
       this.getGame(gameId),
-      db.getPlayer(playerId)
+      playerService.getPlayer(playerId)
     ];
     return Promise
       .all(promises)
@@ -33,12 +33,10 @@ class GameService {
       .then(game => db.updateGame(game));
   }
 
-  start(gameId) {
-    return db.getGame(gameId)
-      .then(game => {
-        Object.assign(game, {status: 'running'});
-        return db.updateGame(game);
-      });
+  startGame(gameId) {
+    let updates = {status: 'running'};
+
+    return db.updateGameById(gameId, updates);
   }
 };
 

@@ -61,22 +61,44 @@ class Database {
     for(let i=0; i<this.games.length; ++i) {
       if(this.games[i].id == game.id) {
         this.games[i] = game;
-        break;
+        return Promise.resolve(game);
       }
     }
 
-    return Promise.resolve(game);
+    return Promise.reject('Game not found');
+  }
+
+  updatePlayerById(playerId, updates) {
+    for(let player of this.players) {
+      if(player.id === playerId) {
+        Object.assign(player, updates);
+        return Promise.resolve(player);
+      }
+    }
+    
+    return Promise.reject('Player not found');
+  }
+
+  updateGameById(gameId, updates) {
+    for(let game of this.games) {
+      if(game.id === gameId) {
+        Object.assign(game, updates);
+        return Promise.resolve(game);
+      }
+    }
+
+    return Promise.reject('Game not found');
   }
 
   updatePlayer(player) {
     for(let i=0; i<this.players.length; ++i) {
       if(this.players[i].id == player.id) {
         this.players[i] = player;
-        break;
+        return Promise.resolve(player);
       }
     }
     
-    return Promise.resolve(player);
+    return Promise.reject('Player not found');
   }
 
 };

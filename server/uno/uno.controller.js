@@ -48,11 +48,17 @@ class UnoController {
         }
         return Promise.reject('Some players are not ready');
       })
-      .then(({players, game}) => res.send(game))
+      .then(([players, game]) => res.send(game))
       .catch(error => res.status(400).send({error}));
   }
 
   playerReady(req, res) {
+    let {playerId} = req.body;
+
+    playerService
+      .updatePlayerAsReady(playerId)
+      .then(player => res.send(player))
+      .catch(error => res.status(400).send({error}));
 
   }
 
