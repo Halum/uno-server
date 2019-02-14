@@ -1,11 +1,15 @@
 const gameService = require('./../service/game.service');
 const playerService = require('./../service/player.service');
+const socketService = require('./../service/socket.service');
 
 class UnoController {
   createNewGame(req, res) {
     gameService
       .createNewGame()
-      .then(game => res.send(game))
+      .then(game => {
+        socketService.manageGame(game.id);
+        res.send(game);
+      })
       .catch(error => res.status(400).send({error}));
   }
 

@@ -16,8 +16,10 @@ class SocketService {
     const gameNamespace = this.socketServer.of(gameId);
     this.namespaces[gameId] = gameNamespace;
 
+    console.log('Managing game', gameId);
     gameNamespace.on('connection', socket => {
       console.log('Connected to', gameId);
+      gameNamespace.emit(gameId, 'You are connected to '+gameId);
     });
   }
 

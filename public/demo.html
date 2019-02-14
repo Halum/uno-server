@@ -12,13 +12,13 @@
 <script>
 
 const url = 'http://localhost:3500/uno';
+let game = null;
+let players = [];
+let socket = null;
 
 demo();
 
 function demo() {
-  let game = null;
-  let players = [];
-
   createGame()
     .then(data => {
       game = data;
@@ -43,6 +43,7 @@ function demo() {
     })
     .then(data => {
       console.log('Players joined', data);
+      connectSocket(game.id);
       
       let promises = [];
 
@@ -56,6 +57,13 @@ function demo() {
       players = data;
       console.log('Players ready', players);
     });
+}
+
+function connectSocket(gameId) {
+  console.log('connecting to socket', gameId);
+  socket = io(`/${gameId}`);
+
+  socket.on(gameId, console.log);
 }
 
 function post(path, data) {
