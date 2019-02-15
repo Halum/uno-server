@@ -62,10 +62,8 @@ class Cards {
 
   get state() {
     return {
-      desk: {
-        deck: this.deck.length,
-        discard: this.discardPile[ this.discardPile.length - 1 ]
-      }
+      deck: this.deck.length,
+      discard: this.discardPile[ this.discardPile.length - 1 ]
     }
   }
 

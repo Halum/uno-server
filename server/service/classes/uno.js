@@ -8,7 +8,8 @@ class Uno {
     this.players = [];
     this.deck = new CardDeck();
     this.status = 'waiting';
-    this.currentPlayer = null;
+    this.currentPlayerIdx = 0;
+    this.direction = 1;
 
     
     socketService.manageGame(this);
@@ -61,7 +62,6 @@ class Uno {
       .then(() => {
         this.status = 'running';
         this.deck.begin();
-        this.currentPlayer = 0;
 
         for(let player of this.players) {
           player.statusPlaying();
@@ -73,20 +73,41 @@ class Uno {
   }
 
   broadcastPlayerState() {
-    const cardState = this.deck.state;
+    const cardState = {
+      desk: this.deck.state
+    };
 
     for(let player of this.players) {
-      let state = Object.assign({}, player, cardState);
+      let turn = this.players[ this.currentPlayerIdx ].id === player.id
+        ? true
+        : false;
+      let state = Object.assign({}, player, cardState, {turn});
 
       socketService.broadcast(this.id, player.id, state);
     }
   }
 
+  isValidPlayer(playerId) {
+    return this.players[ this.currentPlayerIdx ].id === playerId;
+  }
+
+  nextPlayer(increament = 1) {
+    if(!this.direction) increament *= -1 ;
+
+    this.currentPlayerIdx += increament;
+
+    if(this.currentPlayerIdx < 0) this.currentPlayerIdx += this.players.length;
+
+    this.currentPlayerIdx %= this.players.length;
+  }
+
   takeCard(playerId) {
+    if(!this.isValidPlayer(playerId)) return;
+
     const player = this.getPlayer(playerId);
 
     this.deck.give(player);
-
+    this.nextPlayer();
     this.broadcastPlayerState();
   }
 
@@ -94,8 +115,10 @@ class Uno {
     const {playerId, card} = data;
     const player = this.getPlayer(playerId);
 
-    player.give(this.deck, card);
+    if(!this.isValidPlayer(playerId)) return;
 
+    player.give(this.deck, card);
+    this.nextPlayer();
     this.broadcastPlayerState();
   }
 }
