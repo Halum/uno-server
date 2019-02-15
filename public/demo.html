@@ -24,16 +24,12 @@ function demo() {
       game = data;
       console.log('Game created', game);
 
-      return createPlayer(makeId(5));
+      return addPlayer(game.id, makeId(5));
     })
     .then(data => {
       player = data;
       console.log('Player created', player);
-      
-      return joinGame(game.id, player.id);
-    })
-    .then(data => {
-      console.log('Player joined', data);
+
       connectSocket(game.id);
       
       return playerReady(game.id, player.id);
@@ -67,16 +63,9 @@ function createGame() {
   return post(path, {});
 }
 
-function createPlayer(playerName) {
-  const path = '/players/new';
-  const data = {playerName};
-
-  return post(path, data);
-}
-
-function joinGame(gameId, playerId) {
-  const path = '/join';
-  const data = {gameId, playerId};
+function addPlayer(gameId, playerName) {
+  const path = '/player';
+  const data = {gameId, playerName};
 
   return post(path, data);
 }
