@@ -11,7 +11,7 @@ class Uno {
     this.currentPlayer = null;
 
     
-    socketService.manageGame(this.id);
+    socketService.manageGame(this);
   }
 
   addPlayer(playerName) {
@@ -20,6 +20,10 @@ class Uno {
     this.players.push(newPlayer);
     
     return newPlayer;
+  }
+
+  getPlayer(playerId) {
+    return this.players.find(player => player.id === playerId);
   }
 
   playerReady(playerId) {
@@ -44,7 +48,10 @@ class Uno {
 
     let intervalTimer = setInterval(()=>{
       socketService.broadcast(this.id, channel, count--);
-      if(count === 0) clearInterval(intervalTimer);
+      if(count === 0) {
+        clearInterval(intervalTimer);
+        this.broadcastPlayerState();
+      }
     }, 900);
   }
 
@@ -53,7 +60,9 @@ class Uno {
       .canStart()
       .then(() => {
         this.status = 'running';
+        this.cards.begin();
         this.currentPlayer = 0;
+
         for(let player of this.players) {
           player.statusPlaying();
         }
@@ -61,6 +70,24 @@ class Uno {
         this.startCountDown();
       })
       .catch(console.error);
+  }
+
+  broadcastPlayerState() {
+    const cardState = this.cards.state;
+
+    for(let player of this.players) {
+      let state = Object.assign({}, player, cardState);
+
+      socketService.broadcast(this.id, player.id, state);
+    }
+  }
+
+  takeCard(playerId) {
+    let player = this.getPlayer(playerId);
+
+    this.cards.give(player);
+
+    this.broadcastPlayerState(playerId);
   }
 }
 

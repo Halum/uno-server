@@ -40,12 +40,17 @@ function demo() {
     });
 }
 
+function takeCard() {
+  socket.emit('take-card', player.id);
+}
+
 function connectSocket(gameId) {
   console.log('connecting to socket', gameId);
   socket = io(`/${gameId}`);
 
   socket.on(gameId, console.log);
   socket.on('count-down', console.log);
+  socket.on(player.id, console.log);
 }
 
 function post(path, data) {

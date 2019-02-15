@@ -23,6 +23,10 @@ class Player {
   isReady() {
     return this.status === 'ready';
   }
+
+  addCard(card) {
+    this.cards.push(card);
+  }
 };
 
 module.exports = Player;

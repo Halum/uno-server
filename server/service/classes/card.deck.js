@@ -6,6 +6,7 @@ class Cards {
                   '2+', 'skip', 'reverse'];
     this.wildTypes = ['wild', '4+'];
     this.deck = [];
+    this.discardPile = [];
 
     this.generate();
   }
@@ -44,6 +45,23 @@ class Cards {
     }
 
     return playerCards;
+  }
+
+  begin() {
+    this.discardPile.push(this.deck.pop());
+  }
+
+  give(player) {
+    player.addCard(this.deck.pop());
+  }
+
+  get state() {
+    return {
+      desk: {
+        deck: this.deck.length,
+        discard: this.discardPile[ this.discardPile.length - 1 ]
+      }
+    }
   }
 };
 

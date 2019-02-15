@@ -12,7 +12,9 @@ class SocketService {
     return Promise.resolve();
   }
 
-  manageGame(gameId) {
+  manageGame(game) {
+    let gameId = game.id;
+
     if(this.namespaces[gameId]) return;
 
     const gameNamespace = this.socketServer.of(gameId);
@@ -22,6 +24,8 @@ class SocketService {
     gameNamespace.on('connection', socket => {
       console.log('Connected to', gameId);
       gameNamespace.emit(gameId, 'You are connected to '+gameId);
+
+      socket.on('take-card', game.takeCard.bind(game));
     });
   }
 
