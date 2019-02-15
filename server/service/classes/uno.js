@@ -6,7 +6,7 @@ class Uno {
   constructor(gameId) {
     this.id = '12345' || gameId;
     this.players = [];
-    this.cards = new CardDeck();
+    this.deck = new CardDeck();
     this.status = 'waiting';
     this.currentPlayer = null;
 
@@ -15,7 +15,7 @@ class Uno {
   }
 
   addPlayer(playerName) {
-    const newPlayer = new Player(playerName, this.cards.getForPlayer());
+    const newPlayer = new Player(playerName, this.deck.getForPlayer());
 
     this.players.push(newPlayer);
     
@@ -60,7 +60,7 @@ class Uno {
       .canStart()
       .then(() => {
         this.status = 'running';
-        this.cards.begin();
+        this.deck.begin();
         this.currentPlayer = 0;
 
         for(let player of this.players) {
@@ -73,7 +73,7 @@ class Uno {
   }
 
   broadcastPlayerState() {
-    const cardState = this.cards.state;
+    const cardState = this.deck.state;
 
     for(let player of this.players) {
       let state = Object.assign({}, player, cardState);
@@ -83,11 +83,20 @@ class Uno {
   }
 
   takeCard(playerId) {
-    let player = this.getPlayer(playerId);
+    const player = this.getPlayer(playerId);
 
-    this.cards.give(player);
+    this.deck.give(player);
 
-    this.broadcastPlayerState(playerId);
+    this.broadcastPlayerState();
+  }
+
+  playCard(data) {
+    const {playerId, card} = data;
+    const player = this.getPlayer(playerId);
+
+    player.give(this.deck, card);
+
+    this.broadcastPlayerState();
   }
 }
 

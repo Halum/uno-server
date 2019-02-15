@@ -26,6 +26,7 @@ class SocketService {
       gameNamespace.emit(gameId, 'You are connected to '+gameId);
 
       socket.on('take-card', game.takeCard.bind(game));
+      socket.on('play-card', game.playCard.bind(game));
     });
   }
 

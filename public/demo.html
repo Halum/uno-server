@@ -44,6 +44,15 @@ function takeCard() {
   socket.emit('take-card', player.id);
 }
 
+function playCard(color, symbol) {
+  let data = {
+    playerId: player.id,
+    card: {color, symbol}
+  }
+
+  socket.emit('play-card', data);
+}
+
 function connectSocket(gameId) {
   console.log('connecting to socket', gameId);
   socket = io(`/${gameId}`);

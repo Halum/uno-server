@@ -27,6 +27,13 @@ class Player {
   addCard(card) {
     this.cards.push(card);
   }
+
+  give(deck, card) {
+    const pos = this.cards.findIndex(c => c.color === card.color && c.symbol === card.symbol);
+    
+    this.cards.splice(pos, 1);
+    deck.addToDiscard(card);
+  }
 };
 
 module.exports = Player;

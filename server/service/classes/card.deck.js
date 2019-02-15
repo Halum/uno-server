@@ -68,6 +68,10 @@ class Cards {
       }
     }
   }
+
+  addToDiscard(card) {
+    this.discardPile.push(card);
+  }
 };
 
 module.exports = Cards;
