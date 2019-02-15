@@ -9,6 +9,7 @@ class Cards {
     this.discardPile = [];
 
     this.generate();
+    this.shuffle();
   }
 
   createCard(color, symbol) {
@@ -30,19 +31,23 @@ class Cards {
     }
   }
 
+  shuffle() {
+    let cards = this.deck;
+    this.deck = [];
+
+    for(let i of Array(cards.length)) {
+      const pos = this.getRandomInt(cards.length);
+      
+      this.deck.push(...cards.splice(pos,1));
+    }
+  }
+
   getRandomInt(max) {
     return Math.floor(Math.random() * Math.floor(max));
   }
 
   getForPlayer() {
-    let playerCards = [];
-
-    for(let i of Array(7)) {
-      const pos = this.getRandomInt(this.deck.length);
-
-      playerCards.push(this.deck[pos]);
-      this.deck.splice(pos, 1);
-    }
+    let playerCards = [...this.deck.splice(0, 7)];
 
     return playerCards;
   }
