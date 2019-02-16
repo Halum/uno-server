@@ -23,6 +23,21 @@ class Player {
   isReady() {
     return this.status === 'ready';
   }
+
+  addCard(card) {
+    this.cards.push(card);
+  }
+
+  give(deck, card) {
+    const pos = this.cards.findIndex(c => c.color === card.color && c.symbol === card.symbol);
+    
+    this.cards.splice(pos, 1);
+    return deck.addToDiscard(card);
+  }
+
+  canPlay(card) {
+    return this.cards.some(c => c.color === card.color && c.symbol === card.symbol);
+  }
 };
 
 module.exports = Player;

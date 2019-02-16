@@ -1,13 +1,14 @@
-
-class Cards {
+class CardDeck {
   constructor() {
     this.suits = ['red', 'blue', 'green', 'yellow'];
     this.types = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
                   '2+', 'skip', 'reverse'];
     this.wildTypes = ['wild', '4+'];
     this.deck = [];
+    this.discardPile = [];
 
     this.generate();
+    this.shuffle();
   }
 
   createCard(color, symbol) {
@@ -29,22 +30,58 @@ class Cards {
     }
   }
 
+  shuffle() {
+    let cards = this.deck;
+    this.deck = [];
+
+    for(let i of Array(cards.length)) {
+      const pos = this.getRandomInt(cards.length);
+      
+      this.deck.push(...cards.splice(pos,1));
+    }
+  }
+
   getRandomInt(max) {
     return Math.floor(Math.random() * Math.floor(max));
   }
 
   getForPlayer() {
-    let playerCards = [];
-
-    for(let i of Array(7)) {
-      const pos = this.getRandomInt(this.deck.length);
-
-      playerCards.push(this.deck[pos]);
-      this.deck.splice(pos, 1);
-    }
+    let playerCards = [...this.deck.splice(0, 7)];
 
     return playerCards;
   }
+
+  begin() {
+    this.discardPile.push(this.deck.pop());
+  }
+
+  give(player) {
+    player.addCard(this.deck.pop());
+  }
+
+  get state() {
+    return {
+      deck: this.deck.length,
+      discard: this.discardPile[ this.discardPile.length - 1 ]
+    }
+  }
+
+  addToDiscard(card) {
+    const result = {
+      increament: card.symbol === 'skip' ? 2 : 1,
+      direction: card.symbol === 'reverse' ? -1 : 1
+    };
+
+    this.discardPile.push(card);
+
+    return result;
+  }
+
+  canPlay(card) {
+    const deskCard = this.discardPile[ this.discardPile.length - 1 ];
+    // what if desk has any wild cards
+    return (card.color === deskCard.color || card.symbol === deskCard.symbol || card.symbol === 'wild' || card.symbol === '4+');
+  }
 };
 
-module.exports = Cards;
+module.exports = CardDeck;

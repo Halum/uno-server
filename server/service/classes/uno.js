@@ -6,20 +6,25 @@ class Uno {
   constructor(gameId) {
     this.id = '12345' || gameId;
     this.players = [];
-    this.cards = new CardDeck();
+    this.deck = new CardDeck();
     this.status = 'waiting';
-    this.currentPlayer = null;
+    this.currentPlayerIdx = 0;
+    this.direction = 1;
 
     
-    socketService.manageGame(this.id);
+    socketService.manageGame(this);
   }
 
   addPlayer(playerName) {
-    const newPlayer = new Player(playerName, this.cards.getForPlayer());
+    const newPlayer = new Player(playerName, this.deck.getForPlayer());
 
     this.players.push(newPlayer);
     
     return newPlayer;
+  }
+
+  getPlayer(playerId) {
+    return this.players.find(player => player.id === playerId);
   }
 
   playerReady(playerId) {
@@ -44,7 +49,10 @@ class Uno {
 
     let intervalTimer = setInterval(()=>{
       socketService.broadcast(this.id, channel, count--);
-      if(count === 0) clearInterval(intervalTimer);
+      if(count === 0) {
+        clearInterval(intervalTimer);
+        this.broadcastPlayerState();
+      }
     }, 900);
   }
 
@@ -53,7 +61,8 @@ class Uno {
       .canStart()
       .then(() => {
         this.status = 'running';
-        this.currentPlayer = 0;
+        this.deck.begin();
+
         for(let player of this.players) {
           player.statusPlaying();
         }
@@ -61,6 +70,63 @@ class Uno {
         this.startCountDown();
       })
       .catch(console.error);
+  }
+
+  broadcastPlayerState() {
+    const cardState = {
+      desk: this.deck.state
+    };
+
+    for(let player of this.players) {
+      let turn = this.players[ this.currentPlayerIdx ].id === player.id
+        ? true
+        : false;
+      let state = Object.assign({}, player, cardState, {turn});
+
+      socketService.broadcast(this.id, player.id, state);
+    }
+  }
+
+  canPlay(playerId, card) {
+    const player = this.players[ this.currentPlayerIdx ];
+    const isValidPlayer = player.id === playerId;
+    const isValidCard = card ? player.canPlay(card) : true;
+    const isValidPlay = card ? this.deck.canPlay(card) : true;
+
+    return isValidPlayer && isValidCard && isValidPlay;
+  }
+
+  nextPlayer(increament = 1) {
+    if(this.direction < 0) increament *= -1 ;
+
+    this.currentPlayerIdx += increament;
+
+    if(this.currentPlayerIdx < 0) this.currentPlayerIdx += this.players.length;
+
+    this.currentPlayerIdx %= this.players.length;
+  }
+
+  takeCard(playerId) {
+    if(!this.canPlay(playerId)) return;
+
+    const player = this.getPlayer(playerId);
+
+    this.deck.give(player);
+    this.nextPlayer();
+    this.broadcastPlayerState();
+  }
+
+  playCard(data) {
+    const {playerId, card} = data;
+    const player = this.getPlayer(playerId);
+
+    if(!this.canPlay(playerId, card)) return;
+
+    const result = player.give(this.deck, card);
+
+    this.direction *= result.direction;
+    this.nextPlayer(result.increament);
+    this.broadcastPlayerState();
   }
 }
 
