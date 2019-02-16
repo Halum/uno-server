@@ -68,7 +68,14 @@ class Cards {
   }
 
   addToDiscard(card) {
+    const result = {
+      increament: card.symbol === 'skip' ? 2 : 1,
+      direction: card.symbol === 'reverse' ? -1 : 1
+    };
+
     this.discardPile.push(card);
+
+    return result;
   }
 };
 

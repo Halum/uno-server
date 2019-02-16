@@ -92,7 +92,7 @@ class Uno {
   }
 
   nextPlayer(increament = 1) {
-    if(!this.direction) increament *= -1 ;
+    if(this.direction < 0) increament *= -1 ;
 
     this.currentPlayerIdx += increament;
 
@@ -117,8 +117,10 @@ class Uno {
 
     if(!this.isValidPlayer(playerId)) return;
 
-    player.give(this.deck, card);
-    this.nextPlayer();
+    const result = player.give(this.deck, card);
+
+    this.direction *= result.direction;
+    this.nextPlayer(result.increament);
     this.broadcastPlayerState();
   }
 }
