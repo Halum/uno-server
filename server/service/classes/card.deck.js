@@ -54,7 +54,9 @@ class CardDeck {
   }
 
   begin() {
-    this.discardPile.push(this.deck.pop());
+    // remember that 'wild' is valid for first round, may want to update later
+    const validCardPos = this.deck.findIndex(card => !this.wildTypes.includes(card.symbol));
+    this.discardPile.push(...this.deck.splice(validCardPos, 1));
   }
 
   give(player) {
