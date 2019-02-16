@@ -63,6 +63,7 @@ function connectSocket(gameId) {
     for(let card of data.cards) {
       console.log(card);
     }
+    console.log('Cards', data.cards.length);
     console.log('desk', data.desk.discard);
     console.log('turn', data.turn);
   });

@@ -32,7 +32,7 @@ class Player {
     const pos = this.cards.findIndex(c => c.color === card.color && c.symbol === card.symbol);
     
     this.cards.splice(pos, 1);
-    return deck.addToDiscard(card);
+    deck.addToDiscard(card);
   }
 
   canPlay(card) {
