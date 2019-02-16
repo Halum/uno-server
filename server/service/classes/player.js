@@ -34,6 +34,10 @@ class Player {
     this.cards.splice(pos, 1);
     return deck.addToDiscard(card);
   }
+
+  canPlay(card) {
+    return this.cards.some(c => c.color === card.color && c.symbol === card.symbol);
+  }
 };
 
 module.exports = Player;

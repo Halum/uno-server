@@ -87,8 +87,13 @@ class Uno {
     }
   }
 
-  isValidPlayer(playerId) {
-    return this.players[ this.currentPlayerIdx ].id === playerId;
+  canPlay(playerId, card) {
+    const player = this.players[ this.currentPlayerIdx ];
+    const isValidPlayer = player.id === playerId;
+    const isValidCard = card ? player.canPlay(card) : true;
+    const isValidPlay = card ? this.deck.canPlay(card) : true;
+
+    return isValidPlayer && isValidCard && isValidPlay;
   }
 
   nextPlayer(increament = 1) {
@@ -102,7 +107,7 @@ class Uno {
   }
 
   takeCard(playerId) {
-    if(!this.isValidPlayer(playerId)) return;
+    if(!this.canPlay(playerId)) return;
 
     const player = this.getPlayer(playerId);
 
@@ -115,7 +120,7 @@ class Uno {
     const {playerId, card} = data;
     const player = this.getPlayer(playerId);
 
-    if(!this.isValidPlayer(playerId)) return;
+    if(!this.canPlay(playerId, card)) return;
 
     const result = player.give(this.deck, card);
 

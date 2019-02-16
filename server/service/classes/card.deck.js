@@ -1,5 +1,4 @@
-
-class Cards {
+class CardDeck {
   constructor() {
     this.suits = ['red', 'blue', 'green', 'yellow'];
     this.types = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
@@ -77,6 +76,12 @@ class Cards {
 
     return result;
   }
+
+  canPlay(card) {
+    const deskCard = this.discardPile[ this.discardPile.length - 1 ];
+    // what if desk has any wild cards
+    return (card.color === deskCard.color || card.symbol === deskCard.symbol || card.symbol === 'wild' || card.symbol === '4+');
+  }
 };
 
-module.exports = Cards;
+module.exports = CardDeck;
