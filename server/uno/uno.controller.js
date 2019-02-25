@@ -16,7 +16,7 @@ class UnoController {
 
     this.games[gameId] = this.games[gameId] || game;
 
-    res.send(game);
+    res.send({gameId: game.id});
   }
 
   addPlayer(req, res) {
