@@ -65,14 +65,17 @@
   ```
 
 ### Socket Events
+- URL: `http://localhost:3500`
+- Namespace: `<gameId>`
+- How to connect: ```io(`http://localhost:3500/${gameId})```
 
 #### Game Update
-- Event: ``
+- Event: `<gameId>`
 - Type: `listen`
 - Response: `You are connected to <gameId>`
 
 #### Player Update
-- Event: ``
+- Event: `<playerId>`
 - Type: `listen`
 - Response:
 ```
