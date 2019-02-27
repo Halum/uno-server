@@ -24,15 +24,15 @@ function demo() {
       game = data;
       console.log('Game created', game);
 
-      return addPlayer(game.id, makeId(5));
+      return addPlayer(game.gameId, makeId(5));
     })
     .then(data => {
       player = data;
       console.log('Player created', player);
 
-      connectSocket(game.id);
+      connectSocket(game.gameId);
       
-      return playerReady(game.id, player.id);
+      return playerReady(game.gameId, player.id);
     })
     .then(data => {
       player = data;
@@ -55,7 +55,7 @@ function playCard(color, symbol) {
 
 function connectSocket(gameId) {
   console.log('connecting to socket', gameId);
-  socket = io(`/${gameId}`);
+  socket = io(`http://localhost:3500/${gameId}`);
 
   socket.on(gameId, console.log);
   socket.on('count-down', console.log);
@@ -87,7 +87,7 @@ function createGame() {
 function addPlayer(gameId, playerName) {
   const path = '/player';
   const data = {gameId, playerName};
-
+console.log(data);
   return post(path, data);
 }
 
