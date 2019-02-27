@@ -1,15 +1,15 @@
 # Table of Contents
 
-[REST API]()
-- [Create Game]()
-- [Join Game]()
-- [Player Ready]()
+[REST API](#rest-api)
+- [Create Game](#create-game)
+- [Join Game](#join-game)
+- [Player Ready](#player-ready)
 
-[Socket Events]()
-- [Game Update]()
-- [Player Update]()
-- [Take Card]()
-- [Play Card]()
+[Socket Events](#socket-events)
+- [Game Update](#game-update)
+- [Player Update](#player-update)
+- [Take Card](#take-card)
+- [Play Card](#play-card)
 
 
 ### REST API
@@ -69,7 +69,7 @@
 #### Game Update
 - Event: ``
 - Type: `listen`
-- Response:
+- Response: `You are connected to <gameId>`
 
 #### Player Update
 - Event: ``
