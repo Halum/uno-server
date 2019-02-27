@@ -20,6 +20,9 @@ This is a server created with [express](https://expressjs.com/) & [socket.io](ht
 #### Running Locally
 - Run `npm start` to run the server.
 
+## API
+See [API](API.md)
+
 ## Credits
 
 **Original Author**
