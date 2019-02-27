@@ -106,12 +106,13 @@ class Uno {
     this.currentPlayerIdx %= this.players.length;
   }
 
-  takeCard(playerId) {
+  takeCard(playerId, totalTake = 1) {
     if(!this.canPlay(playerId)) return;
 
     const player = this.getPlayer(playerId);
 
-    this.deck.give(player);
+    for(let i of Array(totalTake)) this.deck.give(player);
+    
     this.nextPlayer();
     this.broadcastPlayerState();
   }
@@ -122,9 +123,20 @@ class Uno {
 
     if(!this.canPlay(playerId, card)) return;
 
-    const result = player.give(this.deck, card);
+    player.give(this.deck, card);
+
+    const result = this.deck.getPlayResult(card);
 
     this.direction *= result.direction;
+
+    if(result.nexPlayerTake) {
+      // as next player must take cards from deck
+      // make him next palyer and force him to take cards
+      this.nextPlayer();
+      const player = this.players[ this.currentPlayerIdx ];
+      return this.takeCard(player.id, result.nexPlayerTake);
+    }
+
     this.nextPlayer(result.increament);
     this.broadcastPlayerState();
   }

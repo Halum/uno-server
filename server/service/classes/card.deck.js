@@ -4,6 +4,8 @@ class CardDeck {
     this.types = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
                   '2+', 'skip', 'reverse'];
     this.wildTypes = ['wild', '4+'];
+    this.penaltyCards = ['2+', '4+'];
+    this.skipCards = ['skip', ...this.penaltyCards];
     this.deck = [];
     this.discardPile = [];
 
@@ -52,7 +54,9 @@ class CardDeck {
   }
 
   begin() {
-    this.discardPile.push(this.deck.pop());
+    // remember that 'wild' is valid for first round, may want to update later
+    const validCardPos = this.deck.findIndex(card => !this.wildTypes.includes(card.symbol));
+    this.discardPile.push(...this.deck.splice(validCardPos, 1));
   }
 
   give(player) {
@@ -67,20 +71,23 @@ class CardDeck {
   }
 
   addToDiscard(card) {
-    const result = {
-      increament: card.symbol === 'skip' ? 2 : 1,
-      direction: card.symbol === 'reverse' ? -1 : 1
-    };
-
     this.discardPile.push(card);
-
-    return result;
   }
 
   canPlay(card) {
     const deskCard = this.discardPile[ this.discardPile.length - 1 ];
     // what if desk has any wild cards
-    return (card.color === deskCard.color || card.symbol === deskCard.symbol || card.symbol === 'wild' || card.symbol === '4+');
+    return (card.color === deskCard.color || card.symbol === deskCard.symbol || this.wildTypes.includes(card.symbol));
+  }
+
+  getPlayResult(card) {
+    const result = {
+      increament: this.skipCards.includes(card.symbol) ? 2 : 1,
+      direction: card.symbol === 'reverse' ? -1 : 1,
+      nexPlayerTake: this.penaltyCards.includes(card.symbol) ? parseInt(card.symbol) : 0
+    };
+
+    return result;
   }
 };
 
