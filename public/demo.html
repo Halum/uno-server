@@ -60,12 +60,13 @@ function connectSocket(gameId) {
   socket.on(gameId, console.log);
   socket.on('count-down', console.log);
   socket.on(player.playerId, data => {
-    for(let card of data.cards) {
+    console.log(data);
+    for(let card of data.player.cards) {
       console.log(card);
     }
-    console.log('Cards', data.cards.length);
-    console.log('desk', data.desk.discard);
-    console.log('turn', data.turn);
+    console.log('Cards', data.player.cards.length);
+    console.log('desk', data.game.desk.discard);
+    console.log('turn', data.player.turn);
   });
 }
 
