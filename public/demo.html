@@ -32,7 +32,7 @@ function demo() {
 
       connectSocket(game.gameId);
       
-      return playerReady(game.gameId, player.id);
+      return playerReady(game.gameId, player.playerId);
     })
     .then(data => {
       player = data;
@@ -41,12 +41,12 @@ function demo() {
 }
 
 function takeCard() {
-  socket.emit('take-card', player.id);
+  socket.emit('take-card', player.playerId);
 }
 
 function playCard(color, symbol) {
   let data = {
-    playerId: player.id,
+    playerId: player.playerId,
     card: {color, symbol}
   }
 
@@ -59,7 +59,7 @@ function connectSocket(gameId) {
 
   socket.on(gameId, console.log);
   socket.on('count-down', console.log);
-  socket.on(player.id, data => {
+  socket.on(player.playerId, data => {
     for(let card of data.cards) {
       console.log(card);
     }
