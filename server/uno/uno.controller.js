@@ -34,7 +34,7 @@ class UnoController {
 
     game.start();
 
-    res.send(player);
+    res.send(player.json());
   }
 };
 
