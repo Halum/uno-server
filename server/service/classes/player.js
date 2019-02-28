@@ -8,6 +8,13 @@ class Player {
     this.status = 'waiting';
   }
 
+  json() {
+    const playerData = {...this, playerId: this.id};
+    delete playerData.id;
+
+    return playerData;
+  }
+
   statusReady() {
     this.status = 'ready';
 
