@@ -44,7 +44,7 @@ class Uno {
   }
 
   startCountDown() {
-    let count = 5;
+    let count = 3;
     let channel = 'count-down';
 
     let intervalTimer = setInterval(()=>{
