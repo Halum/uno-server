@@ -81,7 +81,7 @@ class Uno {
       let turn = this.players[ this.currentPlayerIdx ].id === player.id
         ? true
         : false;
-      let state = Object.assign({}, player, cardState, {turn});
+      let state = {...player.json(), ...cardState, turn};
 
       socketService.broadcast(this.id, player.id, state);
     }

@@ -24,7 +24,7 @@ class UnoController {
     let game = this.games[gameId];
     let player = game.addPlayer(playerName);
 
-    res.send(player);
+    res.send(player.json());
   }
 
   playerReady(req, res) {
