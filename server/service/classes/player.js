@@ -48,7 +48,7 @@ class Player {
 
   summary(currentPlayerId) {
     return {
-      name: this.name,
+      playerName: this.name,
       cardCount: this.cards.length,
       playing: currentPlayerId === this.id
     };
