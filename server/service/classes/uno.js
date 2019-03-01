@@ -22,55 +22,6 @@ class Uno {
     return newPlayer;
   }
 
-  getPlayer(playerId) {
-    return this.players.find(player => player.id === playerId);
-  }
-
-  playerReady(playerId) {
-    for(let player  of this.players) {
-      if(player.id === playerId) {
-        return player.statusReady();
-      }
-    }
-  }
-
-  canStart() {
-    if(this.players.length > 1 && this.players.every(player => player.isReady())) {
-      return Promise.resolve();
-    }
-
-    return Promise.reject('Some players are not ready');
-  }
-
-  startCountDown() {
-    let count = 3;
-    let channel = 'count-down';
-
-    let intervalTimer = setInterval(()=>{
-      socketService.broadcast(this.id, channel, count--);
-      if(count === 0) {
-        clearInterval(intervalTimer);
-        this.broadcastPlayerState();
-      }
-    }, 900);
-  }
-
-  start() {
-    return this
-      .canStart()
-      .then(() => {
-        this.status = 'running';
-        this.deck.begin();
-
-        for(let player of this.players) {
-          player.statusPlaying();
-        }
-
-        this.startCountDown();
-      })
-      .catch(console.error);
-  }
-
   broadcastPlayerState() {
     const cardState = {
       desk: this.deck.state
@@ -103,6 +54,18 @@ class Uno {
     return isValidPlayer && isValidCard && isValidPlay;
   }
 
+  canStart() {
+    if(this.players.length > 1 && this.players.every(player => player.isReady())) {
+      return Promise.resolve();
+    }
+
+    return Promise.reject('Some players are not ready');
+  }
+
+  getPlayer(playerId) {
+    return this.players.find(player => player.id === playerId);
+  }
+
   nextPlayer(increament = 1) {
     if(this.direction < 0) increament *= -1 ;
 
@@ -111,17 +74,6 @@ class Uno {
     if(this.currentPlayerIdx < 0) this.currentPlayerIdx += this.players.length;
 
     this.currentPlayerIdx %= this.players.length;
-  }
-
-  takeCard(playerId, totalTake = 1) {
-    if(!this.canPlay(playerId)) return;
-
-    const player = this.getPlayer(playerId);
-
-    for(let i of Array(totalTake)) this.deck.give(player);
-    
-    this.nextPlayer();
-    this.broadcastPlayerState();
   }
 
   playCard(data) {
@@ -145,6 +97,54 @@ class Uno {
     }
 
     this.nextPlayer(result.increament);
+    this.broadcastPlayerState();
+  }
+
+  playerReady(playerId) {
+    for(let player  of this.players) {
+      if(player.id === playerId) {
+        return player.statusReady();
+      }
+    }
+  }
+
+  start() {
+    return this
+      .canStart()
+      .then(() => {
+        this.status = 'running';
+        this.deck.begin();
+
+        for(let player of this.players) {
+          player.statusPlaying();
+        }
+
+        this.startCountDown();
+      })
+      .catch(console.error);
+  }
+
+  startCountDown() {
+    let count = 3;
+    let channel = 'count-down';
+
+    let intervalTimer = setInterval(()=>{
+      socketService.broadcast(this.id, channel, count--);
+      if(count === 0) {
+        clearInterval(intervalTimer);
+        this.broadcastPlayerState();
+      }
+    }, 900);
+  }
+
+  takeCard(playerId, totalTake = 1) {
+    if(!this.canPlay(playerId)) return;
+
+    const player = this.getPlayer(playerId);
+
+    for(let i of Array(totalTake)) this.deck.give(player);
+    
+    this.nextPlayer();
     this.broadcastPlayerState();
   }
 }
