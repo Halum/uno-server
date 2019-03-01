@@ -8,6 +8,14 @@ class Player {
     this.status = 'waiting';
   }
 
+  summary(currentPlayerId) {
+    return {
+      name: this.name,
+      cardCount: this.cards.length,
+      playing: currentPlayerId === this.id
+    };
+  }
+
   json() {
     const playerData = {...this, playerId: this.id};
     delete playerData.id;

@@ -11,7 +11,6 @@ class Uno {
     this.currentPlayerIdx = 0;
     this.direction = 1;
 
-    
     socketService.manageGame(this);
   }
 
@@ -76,14 +75,19 @@ class Uno {
     const cardState = {
       desk: this.deck.state
     };
+    const currentPlayer = this.players[ this.currentPlayerIdx ];
+    const direction = this.direction;
+    // make a list of all players along with their card count to show in the game
+    // also let each player know who is current player
+    const participants = this.players.map(player => player.summary(currentPlayer.id));
 
     for(let player of this.players) {
-      let turn = this.players[ this.currentPlayerIdx ].id === player.id
+      let turn = currentPlayer.id === player.id
         ? true
         : false;
       let state = {
         player: {...player.json(), turn}, 
-        game: {...cardState}
+        game: {...cardState, participants, direction}
       };
 
       socketService.broadcast(this.id, player.id, state);
