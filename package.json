@@ -7,7 +7,6 @@
     "client": "npm start --prefix client",
     "client-install": "npm install --prefix client",
     "dev": "concurrently \"npm run server\" \"npm run client\"",
-    "postinstall": "npm run client-install",
     "server": "nodemon -L index.js",
     "start": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
