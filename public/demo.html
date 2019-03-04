@@ -27,8 +27,11 @@ function demo() {
       return addPlayer(game.gameId, makeId(5));
     })
     .then(data => {
-      player = data;
+      player = data.player;
+      const {participants} = data.game;
+
       console.log('Player created', player);
+      console.log('Participants', participants);
 
       connectSocket(game.gameId);
       

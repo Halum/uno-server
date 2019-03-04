@@ -30,7 +30,7 @@ class Uno {
     const direction = this.direction;
     // make a list of all players along with their card count to show in the game
     // also let each player know who is current player
-    const participants = this.players.map(player => player.summary(currentPlayer.id));
+    const participants = this.participantsState();
 
     for(let player of this.players) {
       let turn = currentPlayer.id === player.id
@@ -74,6 +74,18 @@ class Uno {
     if(this.currentPlayerIdx < 0) this.currentPlayerIdx += this.players.length;
 
     this.currentPlayerIdx %= this.players.length;
+  }
+
+  participantsState() {
+    // if game is not running then we do not have any current player
+    const currentPlayerId = this.status === 'running' 
+      ? this.players[ this.currentPlayerIdx ].id
+      : null;
+    // make a list of all players along with their card count to show in the game
+    // also let each player know who is current player
+    const participants = this.players.map(player => player.summary(currentPlayerId));
+
+    return participants;
   }
 
   playCard(data) {

@@ -20,11 +20,12 @@ class UnoController {
   }
 
   addPlayer(req, res) {
-    let {gameId, playerName} = req.body;
-    let game = this.games[gameId];
-    let player = game.addPlayer(playerName);
+    const {gameId, playerName} = req.body;
+    const game = this.games[gameId];
+    const player = game.addPlayer(playerName);
+    const participants = game.participantsState();
 
-    res.send(player.json());
+    res.send({player: player.json(), game: {participants}});
   }
 
   playerReady(req, res) {
