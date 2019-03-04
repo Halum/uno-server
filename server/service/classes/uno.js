@@ -18,6 +18,7 @@ class Uno {
     const newPlayer = new Player(playerName, this.deck.getForPlayer());
 
     this.players.push(newPlayer);
+    this.broadcastPlayerState();
     
     return newPlayer;
   }
