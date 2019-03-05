@@ -13,11 +13,11 @@ class Player {
   }
 
   canPlay(card) {
-    return this.cards.some(c => c.color === card.color && c.symbol === card.symbol);
+    return this.cards.some(c => (c.color === card.color && c.symbol === card.symbol) || (c.symbol === card.symbol && ['wild', '4+'].includes(card.symbol)));
   }
 
   give(deck, card) {
-    const pos = this.cards.findIndex(c => c.color === card.color && c.symbol === card.symbol);
+    const pos = this.cards.findIndex(c => (c.color === card.color && c.symbol === card.symbol) || (c.symbol === card.symbol && ['wild', '4+'].includes(card.symbol)));
     
     this.cards.splice(pos, 1);
     deck.addToDiscard(card);
