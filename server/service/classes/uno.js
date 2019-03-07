@@ -5,11 +5,12 @@ const socketService = require('./../socket.service');
 class Uno {
   constructor(gameId) {
     this.id = '12345' || gameId;
-    this.players = [];
-    this.deck = new CardDeck();
-    this.status = 'waiting';
     this.currentPlayerIdx = 0;
+    this.deck = new CardDeck();
     this.direction = 1;
+    this.players = [];
+    this.status = 'waiting';
+    this.ranking = [];
 
     socketService.manageGame(this);
   }
@@ -18,29 +19,33 @@ class Uno {
     const newPlayer = new Player(playerName, this.deck.getForPlayer());
 
     this.players.push(newPlayer);
-    this.broadcastPlayerState();
+    this.broadcastGameState();
     
     return newPlayer;
   }
 
-  broadcastPlayerState() {
+  broadcastGameState() {
     const cardState = {
       desk: this.deck.state
     };
     const currentPlayer = this.players[ this.currentPlayerIdx ];
     const direction = this.direction;
+    const ranking = this.ranking.map(player => player.summary());
     // make a list of all players along with their card count to show in the game
     // also let each player know who is current player
     const participants = this.participantsState();
 
-    for(let player of this.players) {
+    // need to broadcast to both running players and ranking players
+    for(let player of [...this.players, ...this.ranking]) {
       let turn = currentPlayer.id === player.id
         ? true
         : false;
       let state = {
         player: {...player.json(), turn}, 
-        game: {...cardState, participants, direction}
+        game: {...cardState, participants, direction, ranking}
       };
+
+      console.log('broadcast', player.id, JSON.stringify(state));
 
       socketService.broadcast(this.id, player.id, state);
     }
@@ -65,6 +70,11 @@ class Uno {
 
   getPlayer(playerId) {
     return this.players.find(player => player.id === playerId);
+  }
+
+  rankPlayer(player) {
+    this.players = this.players.filter(val => val.id !== player.id);
+    this.ranking.push(player);
   }
 
   nextPlayer(increament = 1) {
@@ -92,10 +102,18 @@ class Uno {
   playCard(data) {
     const {playerId, card} = data;
     const player = this.getPlayer(playerId);
+    console.log('playCard', playerId, player.name, card);
 
     if(!this.canPlay(playerId, card)) return;
 
+    console.log('playCard valid', playerId, player.name, card);
+
     player.give(this.deck, card);
+
+    if(player.isGameComplete()) {
+      console.log('player.isGameComplete', playerId, player.name);
+      this.rankPlayer(player);
+    }
 
     const result = this.deck.getPlayResult(card);
 
@@ -110,7 +128,7 @@ class Uno {
     }
 
     this.nextPlayer(result.increament);
-    this.broadcastPlayerState();
+    this.broadcastGameState();
   }
 
   playerReady(playerId) {
@@ -145,20 +163,22 @@ class Uno {
       socketService.broadcast(this.id, channel, count--);
       if(count === 0) {
         clearInterval(intervalTimer);
-        this.broadcastPlayerState();
+        this.broadcastGameState();
       }
     }, 900);
   }
 
   takeCard(playerId, totalTake = 1) {
+    console.log('takeCard', playerId, totalTake);
     if(!this.canPlay(playerId)) return;
+    console.log('takeCard valid', playerId, totalTake);
 
     const player = this.getPlayer(playerId);
 
     for(let i of Array(totalTake)) this.deck.give(player);
     
     this.nextPlayer();
-    this.broadcastPlayerState();
+    this.broadcastGameState();
   }
 }
 
