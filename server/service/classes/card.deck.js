@@ -1,3 +1,5 @@
+import shuffle from 'shuffle-array';
+
 class CardDeck {
   constructor() {
     this.suits = ['red', 'blue', 'green', 'yellow'];
@@ -33,14 +35,7 @@ class CardDeck {
   }
 
   shuffle() {
-    let cards = this.deck;
-    this.deck = [];
-
-    for(let i of Array(cards.length)) {
-      const pos = this.getRandomInt(cards.length);
-      
-      this.deck.push(...cards.splice(pos,1));
-    }
+    shuffle(this.deck);
   }
 
   getRandomInt(max) {
@@ -61,6 +56,15 @@ class CardDeck {
 
   give(player) {
     player.addCard(this.deck.pop());
+    // this if deck is empty then get cards from discardPie
+    if(this.deck.length === 0) this.recycleCards();
+  }
+
+  recycleCards() {
+    // move all cards from discard pile to deck excepts for the last one
+    // because the last one needs to keep displayed
+    this.deck = this.discardPile.splice(-1);
+    shuffle(this.deck);
   }
 
   get state() {
