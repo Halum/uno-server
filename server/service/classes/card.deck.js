@@ -15,6 +15,22 @@ class CardDeck {
     this.shuffle();
   }
 
+  addToDiscard(card) {
+    this.discardPile.push(card);
+  }
+
+  begin() {
+    // remember that 'wild' is valid for first round, may want to update later
+    const validCardPos = this.deck.findIndex(card => !this.wildTypes.includes(card.symbol));
+    this.discardPile.push(...this.deck.splice(validCardPos, 1));
+  }
+
+  canPlay(card) {
+    const deskCard = this.discardPile[ this.discardPile.length - 1 ];
+    // what if desk has any wild cards
+    return (card.color === deskCard.color || card.symbol === deskCard.symbol || this.wildTypes.includes(card.symbol));
+  }
+
   createCard(color, symbol) {
     return {color, symbol};
   }
@@ -34,12 +50,14 @@ class CardDeck {
     }
   }
 
-  shuffle() {
-    shuffle(this.deck);
-  }
+  getPlayResult(card) {
+    const result = {
+      increament: this.skipCards.includes(card.symbol) ? 2 : 1,
+      direction: card.symbol === 'reverse' ? -1 : 1,
+      nexPlayerTake: this.penaltyCards.includes(card.symbol) ? parseInt(card.symbol) : 0
+    };
 
-  getRandomInt(max) {
-    return Math.floor(Math.random() * Math.floor(max));
+    return result;
   }
 
   getForPlayer() {
@@ -48,10 +66,15 @@ class CardDeck {
     return playerCards;
   }
 
-  begin() {
-    // remember that 'wild' is valid for first round, may want to update later
-    const validCardPos = this.deck.findIndex(card => !this.wildTypes.includes(card.symbol));
-    this.discardPile.push(...this.deck.splice(validCardPos, 1));
+  getRandomInt(max) {
+    return Math.floor(Math.random() * Math.floor(max));
+  }
+
+  get state() {
+    return {
+      deck: this.deck.length,
+      discard: this.discardPile[ this.discardPile.length - 1 ]
+    }
   }
 
   give(player) {
@@ -67,31 +90,8 @@ class CardDeck {
     shuffle(this.deck);
   }
 
-  get state() {
-    return {
-      deck: this.deck.length,
-      discard: this.discardPile[ this.discardPile.length - 1 ]
-    }
-  }
-
-  addToDiscard(card) {
-    this.discardPile.push(card);
-  }
-
-  canPlay(card) {
-    const deskCard = this.discardPile[ this.discardPile.length - 1 ];
-    // what if desk has any wild cards
-    return (card.color === deskCard.color || card.symbol === deskCard.symbol || this.wildTypes.includes(card.symbol));
-  }
-
-  getPlayResult(card) {
-    const result = {
-      increament: this.skipCards.includes(card.symbol) ? 2 : 1,
-      direction: card.symbol === 'reverse' ? -1 : 1,
-      nexPlayerTake: this.penaltyCards.includes(card.symbol) ? parseInt(card.symbol) : 0
-    };
-
-    return result;
+  shuffle() {
+    shuffle(this.deck);
   }
 };
 
