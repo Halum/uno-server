@@ -1,4 +1,4 @@
-import shuffle from 'shuffle-array';
+const shuffle = require('shuffle-array');
 
 class CardDeck {
   constructor() {

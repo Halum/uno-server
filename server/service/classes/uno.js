@@ -46,6 +46,7 @@ class Uno {
       };
 
       console.log('broadcast', player.id, JSON.stringify(state));
+      console.log('-------------------------------------------');
 
       socketService.broadcast(this.id, player.id, state);
     }
@@ -111,8 +112,14 @@ class Uno {
     player.give(this.deck, card);
 
     if(player.isGameComplete()) {
+      // this player is done with the game, move him to the ranking section
       console.log('player.isGameComplete', playerId, player.name);
       this.rankPlayer(player);
+    }
+
+    if(this.players.length === 1) {
+      // only one player remaing, so move him to the ranking section
+      this.rankPlayer(this.players[0]);
     }
 
     const result = this.deck.getPlayResult(card);
