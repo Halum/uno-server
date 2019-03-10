@@ -33,6 +33,7 @@
   "dependencies": {
     "express": "latest",
     "randomstring": "^1.1.5",
+    "shuffle-array": "^1.0.1",
     "socket.io": "2.2.0"
   },
   "devDependencies": {
