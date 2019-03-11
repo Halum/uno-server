@@ -15,6 +15,20 @@ app.use((req, res, next) => {
 app.use(express.json());
 app.use('/uno/', unoRouter);
 
+
+if(process.env.NODE_ENV === 'production') {
+  //production mode
+  app.use(express.static(path.join(__dirname, 'client/build')));
+  app.get('/ui', (req, res) => {
+    res.sendfile(path.join(__dirname = 'client/build/index.html'));
+  })
+} else {
+  //build mode
+  app.get('/ui', (req, res) => {
+    res.sendFile(path.join(__dirname+'/client/public/index.html'));
+  })
+}
+
 // this is temporary
 app.get('/', (req, res) => {
   const demoFilePath = path.resolve(__dirname, '../', 'public/demo.html');
