@@ -139,11 +139,9 @@ class Uno {
   }
 
   playerReady(playerId) {
-    for(let player  of this.players) {
-      if(player.id === playerId) {
-        return player.statusReady();
-      }
-    }
+    const player = this.getPlayer(playerId);
+    player.statusReady();
+    this.broadcastGameState();
   }
 
   start() {
