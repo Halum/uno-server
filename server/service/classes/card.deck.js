@@ -79,8 +79,8 @@ class CardDeck {
 
   give(player) {
     player.addCard(this.deck.pop());
-    // this if deck is empty then get cards from discardPie
-    if(this.deck.length === 0) this.recycleCards();
+    // the deck must have at least 4 cards so when a 4+ is played, then it doesn't crash
+    if(this.deck.length < 5) this.recycleCards();
   }
 
   recycleCards() {
