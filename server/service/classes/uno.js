@@ -142,6 +142,7 @@ class Uno {
     const player = this.getPlayer(playerId);
     player.statusReady();
     this.broadcastGameState();
+    return player;
   }
 
   start() {
