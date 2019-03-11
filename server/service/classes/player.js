@@ -58,7 +58,8 @@ class Player {
     return {
       playerName: this.name,
       cardCount: this.cards.length,
-      playing: currentPlayerId === this.id
+      playing: currentPlayerId === this.id,
+      status: this.status
     };
   }
 };
