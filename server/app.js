@@ -18,14 +18,15 @@ app.use('/uno/', unoRouter);
 
 if(process.env.NODE_ENV === 'production') {
   //production mode
-  app.use(express.static(path.join(__dirname, 'client/build')));
-  app.get('/ui', (req, res) => {
-    res.sendfile(path.join(__dirname = 'client/build/index.html'));
-  })
+  app.use(express.static(path.join(__dirname, '../client/build')));
+
+  app.get('/ui', (req,res) =>{
+    res.sendFile(path.join(__dirname, '../client/build/index.html'));
+  });
 } else {
   //build mode
   app.get('/ui', (req, res) => {
-    res.sendFile(path.join(__dirname+'/client/public/index.html'));
+    res.sendFile(path.join(__dirname + './../client/public/index.html'));
   })
 }
 
