@@ -7,6 +7,33 @@ class Player {
     this.cards = cards;
     this.status = 'waiting';
   }
+  
+  addCard(card) {
+    this.cards.push(card);
+  }
+
+  canPlay(card) {
+    return this.cards.some(c => (c.color === card.color && c.symbol === card.symbol) || (c.symbol === card.symbol && ['wild', '4+'].includes(card.symbol)));
+  }
+
+  gameComplete() {
+    this.status = 'complete';
+  }
+
+  give(deck, card) {
+    const pos = this.cards.findIndex(c => (c.color === card.color && c.symbol === card.symbol) || (c.symbol === card.symbol && ['wild', '4+'].includes(card.symbol)));
+    
+    this.cards.splice(pos, 1);
+    deck.addToDiscard(card);
+  }
+
+  isGameComplete() {
+    return this.cards.length === 0;
+  }
+
+  isReady() {
+    return this.status === 'ready';
+  }
 
   json() {
     const playerData = {...this, playerId: this.id};
@@ -15,35 +42,25 @@ class Player {
     return playerData;
   }
 
-  statusReady() {
-    this.status = 'ready';
-
-    return this;
-  }
-
   statusPlaying() {
     this.status = 'playing';
 
     return Promise.resolve(this);
   }
 
-  isReady() {
-    return this.status === 'ready';
+  statusReady() {
+    this.status = 'ready';
+
+    return this;
   }
 
-  addCard(card) {
-    this.cards.push(card);
-  }
-
-  give(deck, card) {
-    const pos = this.cards.findIndex(c => c.color === card.color && c.symbol === card.symbol);
-    
-    this.cards.splice(pos, 1);
-    deck.addToDiscard(card);
-  }
-
-  canPlay(card) {
-    return this.cards.some(c => c.color === card.color && c.symbol === card.symbol);
+  summary(currentPlayerId) {
+    return {
+      playerName: this.name,
+      cardCount: this.cards.length,
+      playing: currentPlayerId === this.id,
+      status: this.status
+    };
   }
 };
 

@@ -1,10 +1,13 @@
 {
   "name": "uno-server",
-  "version": "0.0.1",
+  "version": "0.1.4-aplha",
   "description": "This is a express server to serve as uno game back-end",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon -L index.js",
+    "client": "npm start --prefix client",
+    "client-install": "npm install --prefix client",
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "server": "nodemon -L index.js",
     "start": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -29,8 +32,12 @@
   "homepage": "https://github.com/Halum/uno-server#readme",
   "dependencies": {
     "express": "latest",
-    "nodemon": "latest",
     "randomstring": "^1.1.5",
+    "shuffle-array": "^1.0.1",
     "socket.io": "2.2.0"
+  },
+  "devDependencies": {
+    "concurrently": "^4.1.0",
+    "nodemon": "latest"
   }
 }
