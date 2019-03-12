@@ -28,7 +28,11 @@ class Uno {
     const cardState = {
       desk: this.deck.state
     };
-    const currentPlayer = this.players[ this.currentPlayerIdx ];
+    // if game is complete then we do not have any current player.
+    // TODO: Broadcast game specific logic separately
+    const currentPlayer = this.status === 'complete' 
+      ? {} 
+      : this.players[ this.currentPlayerIdx ];
     const direction = this.direction;
     const ranking = this.ranking.map(player => player.summary());
     // make a list of all players along with their card count to show in the game
@@ -67,6 +71,11 @@ class Uno {
     }
 
     return Promise.reject('Some players are not ready');
+  }
+
+  gameOver() {
+    this.status = 'complete';
+    this.broadcastGameState();
   }
 
   getPlayer(playerId) {
@@ -120,6 +129,7 @@ class Uno {
     if(this.players.length === 1) {
       // only one player remaing, so move him to the ranking section
       this.rankPlayer(this.players[0]);
+      return this.gameOver();
     }
 
     const result = this.deck.getPlayResult(card);
