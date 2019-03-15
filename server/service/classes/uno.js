@@ -40,12 +40,13 @@ class Uno {
     const participants = this.participantsState();
 
     // need to broadcast to both running players and ranking players
+    // TODO ranking player does not need everything to broadcasted
     for(let player of [...this.players, ...this.ranking]) {
       let turn = currentPlayer.id === player.id
         ? true
         : false;
       let state = {
-        player: {...player.json(), turn}, 
+        player: {...player.json(), turn, takenCard: player.takenCard}, 
         game: {...cardState, participants, direction, ranking}
       };
 
@@ -62,7 +63,15 @@ class Uno {
     const isValidCard = card ? player.canPlay(card) : true;
     const isValidPlay = card ? this.deck.canPlay(card) : true;
 
+    console.log('canPlay', playerId, card, isValidPlayer, isValidCard, isValidPlay);
+
     return isValidPlayer && isValidCard && isValidPlay;
+  }
+
+  canSkip(playerId) {
+    const player = this.getPlayer(playerId);
+
+    return this.canPlay(playerId) && player.takeCard !== null;
   }
 
   canStart() {
@@ -155,6 +164,18 @@ class Uno {
     return player;
   }
 
+  skipCard(playerId) {
+    console.log('skipCard', playerId);
+    if(!this.canSkip(playerId)) return;
+
+    const player = this.getPlayer(playerId);
+    player.skipCard();
+    console.log('skipCard', playerId, 'player skipped');
+    // player skipped, move onto next player
+    this.nextPlayer();
+    this.broadcastGameState();
+  }
+
   start() {
     return this
       .canStart()
@@ -192,8 +213,16 @@ class Uno {
     const player = this.getPlayer(playerId);
 
     for(let i of Array(totalTake)) this.deck.give(player);
+
+    if(totalTake !== 1) {
+      // player did not take by will, so someone feed him 2+/4+
+      // we need to skip current player and move to next player
+      this.nextPlayer();
+    } else {
+      console.log('takeCard', playerId, 'skipAbale');
+      player.takeCard();
+    }
     
-    this.nextPlayer();
     this.broadcastGameState();
   }
 }

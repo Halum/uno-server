@@ -1,4 +1,5 @@
 const randomStringGenerator = require('randomstring');
+const CardDeck = require('./card.deck');
 
 class Player {
   constructor(name, cards) {
@@ -6,6 +7,7 @@ class Player {
     this.name = name;
     this.cards = cards;
     this.status = 'waiting';
+    this.takenCard = null;
   }
   
   addCard(card) {
@@ -13,6 +15,7 @@ class Player {
   }
 
   canPlay(card) {
+    if(this.takenCard) return CardDeck.isSame(card, this.takenCard);
     return this.cards.some(c => (c.color === card.color && c.symbol === card.symbol) || (c.symbol === card.symbol && ['wild', '4+'].includes(card.symbol)));
   }
 
@@ -25,6 +28,8 @@ class Player {
     
     this.cards.splice(pos, 1);
     deck.addToDiscard(card);
+    // player playd his card, so no taken card
+    this.takenCard = null;
   }
 
   isGameComplete() {
@@ -40,6 +45,10 @@ class Player {
     delete playerData.id;
 
     return playerData;
+  }
+
+  skipCard() {
+    this.takenCard = null;
   }
 
   statusPlaying() {
@@ -61,6 +70,11 @@ class Player {
       playing: currentPlayerId === this.id,
       status: this.status
     };
+  }
+
+  takeCard() {
+    // make the last card player took as taken card
+    this.takenCard = this.cards[ this.cards.length - 1 ];
   }
 };
 

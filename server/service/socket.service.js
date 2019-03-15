@@ -27,6 +27,7 @@ class SocketService {
 
       socket.on('take-card', game.takeCard.bind(game));
       socket.on('play-card', game.playCard.bind(game));
+      socket.on('skip-card', game.skipCard.bind(game));
     });
   }
 

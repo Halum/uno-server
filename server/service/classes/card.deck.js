@@ -87,11 +87,16 @@ class CardDeck {
     // move all cards from discard pile to deck excepts for the last one
     // because the last one needs to keep displayed
     this.deck = this.discardPile.splice(-1);
+    // TODO discard pile might have colored wild card, need to filter them and make proper changes
     shuffle(this.deck);
   }
 
   shuffle() {
     shuffle(this.deck);
+  }
+
+  static isSame(cardA, cardB) {
+    return cardA.color === cardB.color && cardA.symbol === cardB.symbol;
   }
 };
 
