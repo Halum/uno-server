@@ -1,0 +1,34 @@
+#!/bin/bash
+
+#move the application source
+cp -Rf /tmp/src/. ./
+ 
+if [ ! -z $HTTP_PROXY ]; then
+        echo "---&gt; Setting npm http proxy to $HTTP_PROXY"
+        npm config set proxy $HTTP_PROXY
+fi
+ 
+if [ ! -z $http_proxy ]; then
+        echo "---&gt; Setting npm http proxy to $http_proxy"
+        npm config set proxy $http_proxy
+fi
+ 
+if [ ! -z $HTTPS_PROXY ]; then
+        echo "---&gt; Setting npm https proxy to $HTTPS_PROXY"
+        npm config set https-proxy $HTTPS_PROXY
+fi
+ 
+if [ ! -z $https_proxy ]; then
+        echo "---&gt; Setting npm https proxy to $https_proxy"
+        npm config set https-proxy $https_proxy
+fi
+ 
+echo "---&gt; Building your Node application from source"
+npm install -d
+pushd ./client
+npm install -d
+npm run build
+popd
+ 
+# Fix source directory permissions
+fix-permissions ./

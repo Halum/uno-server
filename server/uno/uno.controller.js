@@ -2,7 +2,6 @@ const Uno = require('./../service/classes/uno');
 
 class UnoController {
   constructor() {
-    console.log('new controller');
     this.games = {};
 
     this.createGame = this.createGame.bind(this);
@@ -11,12 +10,16 @@ class UnoController {
   }
 
   createGame(req, res) {
-    let game = new Uno();
-    let gameId = game.id;
-
+    let {gameId} = req.body;
+    // create a game with given ID or a new game
+    let game = new Uno(gameId);
+    
+    // this line is needed if no gameId is passed in the request
+    gameId = game.id;
+    // if this ID is used by any game then use that game
     this.games[gameId] = this.games[gameId] || game;
 
-    res.send({gameId: game.id});
+    res.send({gameId});
   }
 
   addPlayer(req, res) {

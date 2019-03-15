@@ -1,10 +1,11 @@
 const CardDeck = require('./card.deck');
 const Player = require('./player');
 const socketService = require('./../socket.service');
+const randomStringGenerator = require('randomstring');
 
 class Uno {
   constructor(gameId) {
-    this.id = '12345' || gameId;
+    this.id = gameId || randomStringGenerator.generate({length: 10, capitalization: 'lowercase'});
     this.currentPlayerIdx = 0;
     this.deck = new CardDeck();
     this.direction = 1;

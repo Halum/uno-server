@@ -4,7 +4,8 @@ const http = require('http');
 const socketService = require('./server/service/socket.service');
 
 const server = http.createServer(app);
-const port = config.server.port;
+const ip = process.env.IP || '0.0.0.0';
+const port = process.env.PORT || config.server.port;
 
 const onError = (error)=> {
   if(error.syscall !== 'listen') throw error;
@@ -30,7 +31,7 @@ const onListen = () => {
 }
 
 socketService.init(server);
-server.listen(port);
+server.listen(port, ip);
 server.on('error', onError);
 server.on('listening', onListen);
 
