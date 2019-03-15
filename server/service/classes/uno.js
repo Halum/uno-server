@@ -217,19 +217,20 @@ class Uno {
     }, 900);
   }
 
-  takeCard(playerId, totalTake = 1) {
-    console.log('takeCard', playerId, totalTake);
-    if(!this.canPlay(playerId)) return;
-    console.log('takeCard valid', playerId, totalTake);
+  takeCard(playerId, totalTake = 1, timePenalty = false) {
+    console.log('takeCard', playerId, totalTake, timePenalty);
     if(!this.canTake(playerId)) return;
+    console.log('takeCard valid', playerId, totalTake, timePenalty);
 
     const player = this.getPlayer(playerId);
 
     for(let i of Array(totalTake)) this.deck.give(player);
 
-    if(totalTake !== 1) {
+    if(totalTake !== 1 || timePenalty) {
       // player did not take by will, so someone feed him 2+/4+
       // we need to skip current player and move to next player
+      // Or player gotr a time penalty so can't play penalty card
+      console.log('takeCard', 'nextPlayer', playerId, totalTake, timePenalty);
       this.nextPlayer();
     } else {
       console.log('takeCard', playerId, 'skipAbale');
@@ -237,6 +238,16 @@ class Uno {
     }
     
     this.broadcastGameState();
+  }
+
+  timesUp(playerId) {
+    if(this.canSkip(playerId)) {
+      // player taken a card but not player, so skip his playing
+      this.skipCard(playerId);
+    } else {
+      // give the player a penalty
+      this.takeCard(playerId, 1, true);
+    }
   }
 }
 
