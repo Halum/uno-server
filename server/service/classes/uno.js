@@ -71,13 +71,13 @@ class Uno {
   canSkip(playerId) {
     const player = this.getPlayer(playerId);
 
-    return this.canPlay(playerId) && player.takeCard !== null;
+    return this.canPlay(playerId) && player.takenCard !== null;
   }
 
   canTake(playerId) {
     const player = this.getPlayer(playerId);
 
-    return this.canPlay() && player.takeCard === null;
+    return this.canPlay(playerId) && player.takenCard === null;
   }
 
   canStart() {
