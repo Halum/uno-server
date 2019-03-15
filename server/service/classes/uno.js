@@ -74,6 +74,12 @@ class Uno {
     return this.canPlay(playerId) && player.takeCard !== null;
   }
 
+  canTake(playerId) {
+    const player = this.getPlayer(playerId);
+
+    return this.canPlay() && player.takeCard === null;
+  }
+
   canStart() {
     if(this.players.length > 1 && this.players.every(player => player.isReady())) {
       return Promise.resolve();
@@ -209,6 +215,7 @@ class Uno {
     console.log('takeCard', playerId, totalTake);
     if(!this.canPlay(playerId)) return;
     console.log('takeCard valid', playerId, totalTake);
+    if(!this.canTake(playerId)) return;
 
     const player = this.getPlayer(playerId);
 
