@@ -16,6 +16,8 @@ class Uno {
   }
 
   addPlayer(playerName) {
+    if(!this.canJoin()) return;
+
     const newPlayer = new Player(playerName, this.deck.getForPlayer());
 
     this.players.push(newPlayer);
@@ -55,6 +57,10 @@ class Uno {
 
       socketService.broadcast(this.id, player.id, state);
     }
+  }
+
+  canJoin() {
+    return this.status === 'waiting';
   }
 
   canPlay(playerId, card) {
