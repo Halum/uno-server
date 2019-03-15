@@ -192,8 +192,15 @@ class Uno {
     const player = this.getPlayer(playerId);
 
     for(let i of Array(totalTake)) this.deck.give(player);
+
+    if(totalTake !== 1) {
+      // player did not take by will, so someone feed him 2+/4+
+      // we need to skip current player and move to next player
+      this.nextPlayer();
+    } else {
+      player.tookCard();
+    }
     
-    this.nextPlayer();
     this.broadcastGameState();
   }
 }
