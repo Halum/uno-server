@@ -46,7 +46,7 @@ class Uno {
         ? true
         : false;
       let state = {
-        player: {...player.json(), turn, takenCard: player.takeCard}, 
+        player: {...player.json(), turn, takenCard: player.takenCard}, 
         game: {...cardState, participants, direction, ranking}
       };
 
@@ -63,7 +63,15 @@ class Uno {
     const isValidCard = card ? player.canPlay(card) : true;
     const isValidPlay = card ? this.deck.canPlay(card) : true;
 
+    console.log('canPlay', playerId, card, isValidPlayer, isValidCard, isValidPlay);
+
     return isValidPlayer && isValidCard && isValidPlay;
+  }
+
+  canSkip(playerId) {
+    const player = this.getPlayer(playerId);
+
+    return this.canPlay(playerId) && player.takeCard !== null;
   }
 
   canStart() {
@@ -156,6 +164,18 @@ class Uno {
     return player;
   }
 
+  skipCard(playerId) {
+    console.log('skipCard', playerId);
+    if(!this.canSkip(playerId)) return;
+
+    const player = this.getPlayer(playerId);
+    player.skipCard();
+    console.log('skipCard', playerId, 'player skipped');
+    // player skipped, move onto next player
+    this.nextPlayer();
+    this.broadcastGameState();
+  }
+
   start() {
     return this
       .canStart()
@@ -199,7 +219,8 @@ class Uno {
       // we need to skip current player and move to next player
       this.nextPlayer();
     } else {
-      player.tookCard();
+      console.log('takeCard', playerId, 'skipAbale');
+      player.takeCard();
     }
     
     this.broadcastGameState();

@@ -47,6 +47,10 @@ class Player {
     return playerData;
   }
 
+  skipCard() {
+    this.takenCard = null;
+  }
+
   statusPlaying() {
     this.status = 'playing';
 
@@ -68,7 +72,7 @@ class Player {
     };
   }
 
-  tookCard() {
+  takeCard() {
     // make the last card player took as taken card
     this.takenCard = this.cards[ this.cards.length - 1 ];
   }
