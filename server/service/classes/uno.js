@@ -30,7 +30,7 @@ class Uno {
     };
     // if game is complete then we do not have any current player.
     // TODO: Broadcast game specific logic separately
-    const currentPlayer = this.status === 'complete' 
+    const currentPlayer = this.status === 'complete' || this.status === 'waiting'
       ? {} 
       : this.players[ this.currentPlayerIdx ];
     const direction = this.direction;
