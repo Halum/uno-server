@@ -40,12 +40,13 @@ class Uno {
     const participants = this.participantsState();
 
     // need to broadcast to both running players and ranking players
+    // TODO ranking player does not need everything to broadcasted
     for(let player of [...this.players, ...this.ranking]) {
       let turn = currentPlayer.id === player.id
         ? true
         : false;
       let state = {
-        player: {...player.json(), turn}, 
+        player: {...player.json(), turn, takenCard: player.takeCard}, 
         game: {...cardState, participants, direction, ranking}
       };
 
