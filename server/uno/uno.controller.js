@@ -22,6 +22,9 @@ class UnoController {
   addPlayer(req, res) {
     const {gameId, playerName} = req.body;
     const game = this.games[gameId];
+
+    if(!game.canJoin()) return res.send({});
+
     const player = game.addPlayer(playerName);
     const participants = game.participantsState();
 
