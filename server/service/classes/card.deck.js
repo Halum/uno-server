@@ -50,12 +50,16 @@ class CardDeck {
     }
   }
 
-  getPlayResult(card) {
+  getPlayResult(card, totalPlayer) {
     const result = {
       increament: this.skipCards.includes(card.symbol) ? 2 : 1,
       direction: card.symbol === 'reverse' ? -1 : 1,
       nexPlayerTake: this.penaltyCards.includes(card.symbol) ? parseInt(card.symbol) : 0
     };
+    // special case, when total player 2, reverse should skip opponent
+    if(totalPlayer === 2 && card.symbol === 'reverse') {
+      result.increament = 2;
+    }
 
     return result;
   }
