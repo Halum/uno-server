@@ -154,7 +154,7 @@ class Uno {
       return this.gameOver();
     }
 
-    const result = this.deck.getPlayResult(card);
+    const result = this.deck.getPlayResult(card, this.players.length);
 
     this.direction *= result.direction;
 

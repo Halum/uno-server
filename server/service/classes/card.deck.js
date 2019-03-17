@@ -50,12 +50,16 @@ class CardDeck {
     }
   }
 
-  getPlayResult(card) {
+  getPlayResult(card, totalPlayer) {
     const result = {
       increament: this.skipCards.includes(card.symbol) ? 2 : 1,
       direction: card.symbol === 'reverse' ? -1 : 1,
       nexPlayerTake: this.penaltyCards.includes(card.symbol) ? parseInt(card.symbol) : 0
     };
+    // special case, when total player 2, reverse should skip opponent
+    if(totalPlayer === 2 && card.symbol === 'reverse') {
+      result.increament = 2;
+    }
 
     return result;
   }
@@ -87,7 +91,11 @@ class CardDeck {
     // move all cards from discard pile to deck excepts for the last one
     // because the last one needs to keep displayed
     this.deck = this.discardPile.splice(-1);
-    // TODO discard pile might have colored wild card, need to filter them and make proper changes
+    // discard pile might have colored wild card, need to filter them and make proper changes
+    this.deck = this.deck.map(card => {
+      if(this.wildTypes.includes(card.symbol)) return this.createCard('any', card.symbol);
+      return card;
+    });
     shuffle(this.deck);
   }
 
