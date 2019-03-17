@@ -87,7 +87,11 @@ class CardDeck {
     // move all cards from discard pile to deck excepts for the last one
     // because the last one needs to keep displayed
     this.deck = this.discardPile.splice(-1);
-    // TODO discard pile might have colored wild card, need to filter them and make proper changes
+    // discard pile might have colored wild card, need to filter them and make proper changes
+    this.deck = this.deck.map(card => {
+      if(this.wildTypes.includes(card.symbol)) return this.createCard('any', card.symbol);
+      return card;
+    });
     shuffle(this.deck);
   }
 
