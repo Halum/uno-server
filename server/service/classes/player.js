@@ -15,7 +15,8 @@ class Player {
   }
 
   canPlay(card) {
-    if(this.takenCard) return CardDeck.isSame(card, this.takenCard);
+    // as taken card be an wild card, it's color can be different from the takenCard
+    if(this.takenCard) return CardDeck.isSame(card, this.takenCard) || ['wild', '4+'].includes(card.symbol);
     return this.cards.some(c => (c.color === card.color && c.symbol === card.symbol) || (c.symbol === card.symbol && ['wild', '4+'].includes(card.symbol)));
   }
 
