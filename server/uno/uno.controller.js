@@ -31,7 +31,7 @@ class UnoController {
     const player = game.addPlayer(playerName);
     const participants = game.participantsState();
 
-    res.send({player: player.json(), game: {participants}});
+    res.send({player: player.json(), game: {participants, gameId}});
   }
 
   playerReady(req, res) {
