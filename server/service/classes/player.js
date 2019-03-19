@@ -21,8 +21,9 @@ class Player {
 
   canPlay(card) {
     // as taken card be an wild card, it's color can be different from the takenCard
-    if(this.takenCard) return CardDeck.isSame(card, this.takenCard) || ['wild', '4+'].includes(card.symbol);
-    return this.cards.some(c => (c.color === card.color && c.symbol === card.symbol) || (c.symbol === card.symbol && ['wild', '4+'].includes(card.symbol)));
+    if(this.takenCard) return CardDeck.isValid(card, this.takenCard);
+    return this.cards.some(c => CardDeck.isValid(c, card));
+  }
   }
 
   gameComplete() {
@@ -30,7 +31,7 @@ class Player {
   }
 
   give(deck, card) {
-    const pos = this.cards.findIndex(c => (c.color === card.color && c.symbol === card.symbol) || (c.symbol === card.symbol && ['wild', '4+'].includes(card.symbol)));
+    const pos = this.cards.findIndex(c => CardDeck.isValid(c, card));
     
     this.cards.splice(pos, 1);
     deck.addToDiscard(card);
