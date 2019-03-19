@@ -2,16 +2,18 @@ const CardDeck = require('./card.deck');
 const Player = require('./player');
 const socketService = require('./../socket.service');
 const randomStringGenerator = require('randomstring');
+const shuffle = require('shuffle-array');
 
 class Uno {
-  constructor(gameId) {
+  constructor(gameId, randomizePlayers = false) {
     this.id = gameId || randomStringGenerator.generate({length: 10, capitalization: 'lowercase'});
     this.currentPlayerIdx = 0;
     this.deck = new CardDeck();
     this.direction = 1;
     this.players = [];
-    this.status = 'waiting';
     this.ranking = [];
+    this.randomizePlayers = randomizePlayers;
+    this.status = 'waiting';
 
     socketService.manageGame(this);
   }
@@ -193,6 +195,7 @@ class Uno {
     return this
       .canStart()
       .then(() => {
+        if(this.randomizePlayers) shuffle(this.players);
         this.status = 'running';
         this.deck.begin();
 
