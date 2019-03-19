@@ -37,7 +37,7 @@ class Uno {
     // TODO: Broadcast game specific logic separately
     const currentPlayer = this.status === 'complete' || this.status === 'waiting'
       ? {} 
-      : this.players[ this.currentPlayerIdx ];
+      : this.getCurrentPlayer();
     const direction = this.direction;
     const participants = this.participantsState();
     const ranking = this.ranking.map(player => player.summary());
@@ -83,7 +83,7 @@ class Uno {
   }
 
   canPlay(playerId, card) {
-    const player = this.players[ this.currentPlayerIdx ];
+    const player = this.getCurrentPlayer();
     const isValidPlayer = player.id === playerId;
     const isValidCard = card ? player.canPlay(card) : true;
     const isValidPlay = card ? this.deck.canPlay(card) : true;
@@ -122,6 +122,10 @@ class Uno {
     return this.players.find(player => player.id === playerId);
   }
 
+  getCurrentPlayer() {
+    return this.players[ this.currentPlayerIdx ];
+  }
+
   rankPlayer(player) {
     this.players = this.players.filter(val => val.id !== player.id);
     this.ranking.push(player);
@@ -140,7 +144,7 @@ class Uno {
   participantsState() {
     // if game is not running then we do not have any current player
     const currentPlayerId = this.status === 'running' 
-      ? this.players[ this.currentPlayerIdx ].id
+      ? this.getCurrentPlayer().id
       : null;
     // make a list of all players along with their card count to show in the game
     // also let each player know who is current player
@@ -188,7 +192,7 @@ class Uno {
       // as next player must take cards from deck
       // make him next palyer and force him to take cards
       this.nextPlayer();
-      const player = this.players[ this.currentPlayerIdx ];
+      const player = this.getCurrentPlayer();
       return this.takeCard(player.id, result.nexPlayerTake);
     }
 
