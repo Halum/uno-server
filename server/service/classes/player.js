@@ -53,6 +53,10 @@ class Player {
     return this.status === 'ready';
   }
 
+  isValidForPenalty() {
+    return this.cards.length === 1 && !this.isUno();
+  }
+
   isUno() {
     return this.uno;
   }

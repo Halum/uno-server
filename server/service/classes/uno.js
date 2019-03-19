@@ -158,6 +158,14 @@ class Uno {
 
     console.log('playCard valid', playerId, player.name, card);
 
+    // check for UNO call penalty
+    if(player.isValidForPenalty()) {
+      // next player did not call uno, so give him two cards as penalty
+      console.log('playCard UNO penalty', playerId, player.name, card);
+      this.takeCard(playerId, 2);
+      return this.broadcastGameState();
+    }
+
     player.give(this.deck, card);
 
     if(player.isGameComplete()) {
