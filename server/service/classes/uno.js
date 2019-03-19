@@ -71,7 +71,7 @@ class Uno {
 
   callUno(playerId) {
     const player = this.getPlayer(playerId);
-    player.callUno();
+    player.callUno(this.canPlay());
 
     if(player.isUno()) {
       this.broadcastParticipants();

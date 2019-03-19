@@ -16,8 +16,12 @@ class Player {
     this.clearUno();
   }
 
-  callUno() {
-    if(this.cards.length <= 2) this.uno = true;
+  callUno(myTurn = false) {
+    // player can only call UNO when his turn and has 2 cards
+    // or he can call uno anytime if he has 1 card
+    if((myTurn && this.cards.length === 2) || this.cards.length === 1) {
+      this.uno = true;
+    }
   }
 
   canPlay(card) {
