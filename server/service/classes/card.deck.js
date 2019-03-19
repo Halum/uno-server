@@ -106,6 +106,10 @@ class CardDeck {
   static isSame(cardA, cardB) {
     return cardA.color === cardB.color && cardA.symbol === cardB.symbol;
   }
+
+  static isValidWild(cardA, cardB) {
+    return cardA.symbol === cardB.symbol && ['wild', '4+'].includes(cardA.symbol)
+  }
 };
 
 module.exports = CardDeck;

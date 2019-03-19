@@ -19,8 +19,6 @@ class Uno {
   }
 
   addPlayer(playerName) {
-    if(!this.canJoin()) return;
-
     const newPlayer = new Player(playerName, this.deck.getForPlayer());
 
     this.players.push(newPlayer);
@@ -37,12 +35,11 @@ class Uno {
     // TODO: Broadcast game specific logic separately
     const currentPlayer = this.status === 'complete' || this.status === 'waiting'
       ? {} 
-      : this.players[ this.currentPlayerIdx ];
+      : this.getCurrentPlayer();
     const direction = this.direction;
-    const ranking = this.ranking.map(player => player.summary());
-    // make a list of all players along with their card count to show in the game
-    // also let each player know who is current player
     const participants = this.participantsState();
+    const ranking = this.ranking.map(player => player.summary());
+    const status = this.status;
 
     // need to broadcast to both running players and ranking players
     // TODO ranking player does not need everything to broadcasted
@@ -52,7 +49,7 @@ class Uno {
         : false;
       let state = {
         player: {...player.json(), turn, takenCard: player.takenCard}, 
-        game: {...cardState, participants, direction, ranking}
+        game: {...cardState, participants, direction, ranking, status}
       };
 
       console.log('broadcast', player.id, JSON.stringify(state));
@@ -62,19 +59,37 @@ class Uno {
     }
   }
 
-  canJoin() {
-    return this.status === 'waiting';
+  broadcastParticipants() {
+    const participants = this.participantsState();
+    const gameId = this.id;
+    const data = {game: {participants}};
+
+    socketService.broadcast(gameId, gameId, data);
+  }
+
+  callUno(playerId) {
+    const player = this.getPlayer(playerId);
+    player.callUno(this.canPlay());
+
+    if(player.isUno()) {
+      this.broadcastParticipants();
+    }
+  }
+
+  canJoin(playerName) {
+    // Verify that game is in waiting and no other player has same name
+    return this.status === 'waiting' && this.players.every(player => player.name !== playerName);
   }
 
   canPlay(playerId, card) {
-    const player = this.players[ this.currentPlayerIdx ];
+    const player = this.getCurrentPlayer();
     const isValidPlayer = player.id === playerId;
     const isValidCard = card ? player.canPlay(card) : true;
     const isValidPlay = card ? this.deck.canPlay(card) : true;
 
     console.log('canPlay', playerId, card, isValidPlayer, isValidCard, isValidPlay);
 
-    return isValidPlayer && isValidCard && isValidPlay;
+    return true;//isValidPlayer && isValidCard && isValidPlay;
   }
 
   canSkip(playerId) {
@@ -106,6 +121,10 @@ class Uno {
     return this.players.find(player => player.id === playerId);
   }
 
+  getCurrentPlayer() {
+    return this.players[ this.currentPlayerIdx ];
+  }
+
   rankPlayer(player) {
     this.players = this.players.filter(val => val.id !== player.id);
     this.ranking.push(player);
@@ -124,7 +143,7 @@ class Uno {
   participantsState() {
     // if game is not running then we do not have any current player
     const currentPlayerId = this.status === 'running' 
-      ? this.players[ this.currentPlayerIdx ].id
+      ? this.getCurrentPlayer().id
       : null;
     // make a list of all players along with their card count to show in the game
     // also let each player know who is current player
@@ -141,6 +160,14 @@ class Uno {
     if(!this.canPlay(playerId, card)) return;
 
     console.log('playCard valid', playerId, player.name, card);
+
+    // check for UNO call penalty
+    if(player.isValidForPenalty()) {
+      // next player did not call uno, so give him two cards as penalty
+      console.log('playCard UNO penalty', playerId, player.name, card);
+      this.takeCard(playerId, 2);
+      return this.broadcastGameState();
+    }
 
     player.give(this.deck, card);
 
@@ -164,7 +191,7 @@ class Uno {
       // as next player must take cards from deck
       // make him next palyer and force him to take cards
       this.nextPlayer();
-      const player = this.players[ this.currentPlayerIdx ];
+      const player = this.getCurrentPlayer();
       return this.takeCard(player.id, result.nexPlayerTake);
     }
 
@@ -239,6 +266,11 @@ class Uno {
     } else {
       console.log('takeCard', playerId, 'skipAbale');
       player.takeCard();
+
+      if(!this.canPlay(playerId, player.takenCard)) {
+        // as player can't play the taken card, so no need to stay with him
+        return this.skipCard(playerId);
+      }
     }
     
     this.broadcastGameState();
