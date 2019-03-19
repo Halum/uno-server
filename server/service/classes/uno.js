@@ -39,8 +39,9 @@ class Uno {
       ? {} 
       : this.players[ this.currentPlayerIdx ];
     const direction = this.direction;
-    const ranking = this.ranking.map(player => player.summary());
     const participants = this.participantsState();
+    const ranking = this.ranking.map(player => player.summary());
+    const status = this.status;
 
     // need to broadcast to both running players and ranking players
     // TODO ranking player does not need everything to broadcasted
@@ -50,7 +51,7 @@ class Uno {
         : false;
       let state = {
         player: {...player.json(), turn, takenCard: player.takenCard}, 
-        game: {...cardState, participants, direction, ranking}
+        game: {...cardState, participants, direction, ranking, status}
       };
 
       console.log('broadcast', player.id, JSON.stringify(state));
