@@ -266,6 +266,11 @@ class Uno {
     } else {
       console.log('takeCard', playerId, 'skipAbale');
       player.takeCard();
+
+      if(!this.canPlay(playerId, player.takenCard)) {
+        // as player can't play the taken card, so no need to stay with him
+        return this.skipCard(playerId);
+      }
     }
     
     this.broadcastGameState();
