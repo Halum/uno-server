@@ -107,10 +107,6 @@ class CardDeck {
     return cardA.color === cardB.color && cardA.symbol === cardB.symbol;
   }
 
-  static isValid(cardA, cardB) {
-    return CardDeck.isSame(cardA, cardB) || CardDeck.isValidWild(cardA, cardB);
-  }
-
   static isValidWild(cardA, cardB) {
     return cardA.symbol === cardB.symbol && ['wild', '4+'].includes(cardA.symbol)
   }

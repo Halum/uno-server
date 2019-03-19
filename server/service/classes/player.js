@@ -26,8 +26,8 @@ class Player {
 
   canPlay(card) {
     // as taken card be an wild card, it's color can be different from the takenCard
-    if(this.takenCard) return CardDeck.isValid(card, this.takenCard);
-    return this.cards.some(c => CardDeck.isValid(c, card));
+    if(this.takenCard) return this.isValidCard(card, this.takenCard);
+    return this.cards.some(c => this.isValidCard(c, card));
   }
 
   clearUno() {
@@ -41,7 +41,7 @@ class Player {
   }
 
   give(deck, card) {
-    const pos = this.cards.findIndex(c => CardDeck.isValid(c, card));
+    const pos = this.cards.findIndex(c => this.isValidCard(c, card));
     
     this.cards.splice(pos, 1);
     deck.addToDiscard(card);
@@ -55,6 +55,10 @@ class Player {
 
   isReady() {
     return this.status === 'ready';
+  }
+
+  isValidCard(cardA, cardB) {
+    return CardDeck.isSame(cardA, cardB) || CardDeck.isValidWild(cardA, cardB);
   }
 
   isValidForPenalty() {
