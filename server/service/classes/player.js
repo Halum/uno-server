@@ -13,6 +13,7 @@ class Player {
   
   addCard(card) {
     this.cards.push(card);
+    this.clearUno();
   }
 
   callUno() {
@@ -24,6 +25,11 @@ class Player {
     if(this.takenCard) return CardDeck.isValid(card, this.takenCard);
     return this.cards.some(c => CardDeck.isValid(c, card));
   }
+
+  clearUno() {
+    if(this.cards.length >= 2) {
+      this.uno = false;
+    }
   }
 
   gameComplete() {
