@@ -19,8 +19,6 @@ class Uno {
   }
 
   addPlayer(playerName) {
-    if(!this.canJoin()) return;
-
     const newPlayer = new Player(playerName, this.deck.getForPlayer());
 
     this.players.push(newPlayer);
@@ -78,8 +76,9 @@ class Uno {
     }
   }
 
-  canJoin() {
-    return this.status === 'waiting';
+  canJoin(playerName) {
+    // Verify that game is in waiting and no other player has same name
+    return this.status === 'waiting' && this.players.every(player => player.name !== playerName);
   }
 
   canPlay(playerId, card) {
@@ -90,7 +89,7 @@ class Uno {
 
     console.log('canPlay', playerId, card, isValidPlayer, isValidCard, isValidPlay);
 
-    return isValidPlayer && isValidCard && isValidPlay;
+    return true;//isValidPlayer && isValidCard && isValidPlay;
   }
 
   canSkip(playerId) {
