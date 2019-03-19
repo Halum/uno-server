@@ -4,14 +4,19 @@ const CardDeck = require('./card.deck');
 class Player {
   constructor(name, cards) {
     this.id = randomStringGenerator.generate({length: 10, capitalization: 'lowercase'});
-    this.name = name;
     this.cards = cards;
+    this.name = name;
     this.status = 'waiting';
     this.takenCard = null;
+    this.uno = false;
   }
   
   addCard(card) {
     this.cards.push(card);
+  }
+
+  callUno() {
+    if(this.cards.length <= 2) this.uno = true;
   }
 
   canPlay(card) {

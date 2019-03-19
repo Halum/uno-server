@@ -62,6 +62,11 @@ class Uno {
     }
   }
 
+  callUno(playerId) {
+    const player = this.getPlayer(player);
+    player.callUno();
+  }
+
   canJoin() {
     return this.status === 'waiting';
   }
