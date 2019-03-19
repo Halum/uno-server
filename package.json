@@ -1,6 +1,6 @@
 {
   "name": "uno-server",
-  "version": "0.6.6",
+  "version": "0.7.0",
   "description": "This is a express server to serve as uno game back-end",
   "main": "index.js",
   "scripts": {
