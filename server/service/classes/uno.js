@@ -64,10 +64,9 @@ class Uno {
   broadcastParticipants() {
     const participants = this.participantsState();
     const gameId = this.id;
+    const data = {game: {participants}};
 
-    for(const player of this.players) {
-      socketService.broadcast(gameId, gameId, {game: {participants}});
-    }
+    socketService.broadcast(gameId, gameId, data);
   }
 
   callUno(playerId) {
