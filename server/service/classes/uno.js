@@ -40,8 +40,6 @@ class Uno {
       : this.players[ this.currentPlayerIdx ];
     const direction = this.direction;
     const ranking = this.ranking.map(player => player.summary());
-    // make a list of all players along with their card count to show in the game
-    // also let each player know who is current player
     const participants = this.participantsState();
 
     // need to broadcast to both running players and ranking players
@@ -62,9 +60,22 @@ class Uno {
     }
   }
 
+  broadcastParticipants() {
+    const participants = this.participantsState();
+    const gameId = this.id;
+
+    for(const player of this.players) {
+      socketService.broadcast(gameId, gameId, {game: {participants}});
+    }
+  }
+
   callUno(playerId) {
-    const player = this.getPlayer(player);
+    const player = this.getPlayer(playerId);
     player.callUno();
+
+    if(player.isUno()) {
+      this.broadcastParticipants();
+    }
   }
 
   canJoin() {

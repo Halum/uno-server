@@ -46,6 +46,10 @@ class Player {
     return this.status === 'ready';
   }
 
+  isUno() {
+    return this.uno;
+  }
+
   json() {
     const playerData = {...this, playerId: this.id};
     delete playerData.id;
@@ -74,7 +78,8 @@ class Player {
       playerName: this.name,
       cardCount: this.cards.length,
       playing: currentPlayerId === this.id,
-      status: this.status
+      status: this.status,
+      uno: this.uno
     };
   }
 
