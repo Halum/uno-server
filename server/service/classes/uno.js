@@ -78,7 +78,9 @@ class Uno {
 
   canJoin(playerName) {
     // Verify that game is in waiting and no other player has same name
-    return this.status === 'waiting' && this.players.every(player => player.name !== playerName);
+    return this.status === 'waiting' 
+      && playerName.length <= 15
+      && this.players.every(player => player.name !== playerName);
   }
 
   canPlay(playerId, card) {
