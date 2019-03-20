@@ -89,7 +89,7 @@ class Uno {
 
     console.log('canPlay', playerId, card, isValidPlayer, isValidCard, isValidPlay);
 
-    return true;//isValidPlayer && isValidCard && isValidPlay;
+    return isValidPlayer && isValidCard && isValidPlay;
   }
 
   canSkip(playerId) {
