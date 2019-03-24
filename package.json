@@ -4,7 +4,7 @@
   "description": "This is a express server to serve as uno game back-end",
   "main": "index.js",
   "scripts": {
-    "build": "cd client && npm install && npm run build && cd ..",
+    "build": "npm run client-install && npm run client-build",
     "client": "npm start --prefix client",
     "client-build": "npm run build --prefix client",
     "client-install": "npm install --prefix client",
