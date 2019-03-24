@@ -1,12 +1,10 @@
 {
   "name": "uno-server",
-  "version": "0.8.10",
+  "version": "0.8.9",
   "description": "This is a express server to serve as uno game back-end",
   "main": "index.js",
   "scripts": {
-    "build": "npm run client-install && npm run client-build",
     "client": "npm start --prefix client",
-    "client-build": "npm run build --prefix client",
     "client-install": "npm install --prefix client",
     "dev": "concurrently \"npm run server\" \"npm run client\"",
     "server": "nodemon -L index.js",
