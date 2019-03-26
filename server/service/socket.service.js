@@ -30,6 +30,7 @@ class SocketService {
       socket.on('skip-card', game.skipCard.bind(game));
       socket.on('times-up', game.timesUp.bind(game));
       socket.on('call-uno', game.callUno.bind(game));
+      socket.on('view-cards', game.viewCards.bind(game));
     });
   }
 
