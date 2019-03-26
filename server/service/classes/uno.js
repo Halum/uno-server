@@ -287,6 +287,16 @@ class Uno {
       this.takeCard(playerId, 1, true);
     }
   }
+
+  viewCards({playerId, playerName}) {
+    const player = this.getPlayer(playerId);
+    console.log('viewCards', playerId, playerName, player, this.players.map(a => a.id));
+
+    if(!player.isGameComplete()) return;
+
+    player.visiting = playerName;
+    this.broadcastParticipants();
+  }
 }
 
 module.exports = Uno;
