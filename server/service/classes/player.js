@@ -47,10 +47,14 @@ class Player {
     deck.addToDiscard(card);
     // player playd his card, so no taken card
     this.takenCard = null;
+
+    if(this.cards.length === 0) {
+      this.gameComplete();
+    }
   }
 
   isGameComplete() {
-    return this.cards.length === 0;
+    return this.status === 'complete';
   }
 
   isReady() {
