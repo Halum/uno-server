@@ -177,6 +177,8 @@ class Uno {
     }
 
     if(this.players.length === 1) {
+      // update last player status
+      this.players[0].gameComplete();
       // only one player remaing, so move him to the ranking section
       this.rankPlayer(this.players[0]);
       return this.gameOver();
