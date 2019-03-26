@@ -9,6 +9,7 @@ class Player {
     this.status = 'waiting';
     this.takenCard = null;
     this.uno = false;
+    this.visiting = null;
   }
   
   addCard(card) {
@@ -96,10 +97,13 @@ class Player {
     return this;
   }
 
-  summary(currentPlayerId) {
+  summary(currentPlayerId, hostPlayerName) {
+    const haveVisitor = this.name === hostPlayerName;
+
     return {
-      playerName: this.name,
+      cards: haveVisitor ? this.cards : [],
       cardCount: this.cards.length,
+      playerName: this.name,
       playing: currentPlayerId === this.id,
       status: this.status,
       uno: this.uno

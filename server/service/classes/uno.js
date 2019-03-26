@@ -37,16 +37,14 @@ class Uno {
       ? {} 
       : this.getCurrentPlayer();
     const direction = this.direction;
-    const participants = this.participantsState();
     const ranking = this.ranking.map(player => player.summary());
     const status = this.status;
 
     // need to broadcast to both running players and ranking players
     // TODO ranking player does not need everything to broadcasted
     for(let player of [...this.players, ...this.ranking]) {
-      let turn = currentPlayer.id === player.id
-        ? true
-        : false;
+      const participants = this.participantsState(player);
+      let turn = currentPlayer.id === player.id;
       let state = {
         player: {...player.json(), turn, takenCard: player.takenCard}, 
         game: {...cardState, participants, direction, ranking, status}
@@ -60,11 +58,11 @@ class Uno {
   }
 
   broadcastParticipants() {
-    const participants = this.participantsState();
-    const gameId = this.id;
-    const data = {game: {participants}};
+    for(let player of [...this.players, ...this.ranking]) {
+      const participants = this.participantsState(player);
 
-    socketService.broadcast(gameId, gameId, data);
+      socketService.broadcast(this.id, player.id, {game: {participants}});
+    }
   }
 
   callUno(playerId) {
@@ -119,16 +117,16 @@ class Uno {
     this.broadcastGameState();
   }
 
-  getPlayer(playerId) {
-    return this.players.find(player => player.id === playerId);
-  }
-
   getCurrentPlayer() {
     return this.players[ this.currentPlayerIdx ];
   }
 
+  getPlayer(playerId) {
+    return [...this.players, ...this.ranking].find(player => player.id === playerId);
+  }
+
   rankPlayer(player) {
-    this.players = this.players.filter(val => val.id !== player.id);
+    this.players = this.players.filter(val => !val.isGameComplete());
     this.ranking.push(player);
   }
 
@@ -142,20 +140,19 @@ class Uno {
     this.currentPlayerIdx %= this.players.length;
   }
 
-  participantsState() {
+  participantsState(forPlayer = {}) {
     // if game is not running then we do not have any current player
     const currentPlayerId = this.status === 'running' 
       ? this.getCurrentPlayer().id
       : null;
     // make a list of all players along with their card count to show in the game
     // also let each player know who is current player
-    const participants = this.players.map(player => player.summary(currentPlayerId));
+    const participants = this.players.map(player => player.summary(currentPlayerId, forPlayer.visiting));
 
     return participants;
   }
 
-  playCard(data) {
-    const {playerId, card} = data;
+  playCard({playerId, card}) {
     const player = this.getPlayer(playerId);
     console.log('playCard', playerId, player.name, card);
 
