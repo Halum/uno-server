@@ -75,10 +75,21 @@ class Uno {
   }
 
   canJoin(playerName) {
+    let errorMessage = '';
     // Verify that game is in waiting and no other player has same name
-    return this.status === 'waiting' 
-      && playerName.length <= 15
-      && this.players.every(player => player.name !== playerName);
+    if(this.status === 'running') {
+      errorMessage = 'Game has already began';
+    } else if(this.status === 'complete') {
+      errorMessage = 'Game is complete';
+    } else if(playerName.length > 12) {
+      errorMessage = 'Player name should be max 12 characters';
+    } else if( this.players.some(player => player.name.toLowerCase() === playerName.toLowerCase()) ) {
+      errorMessage = 'Duplicate name is not allowed';
+    } else {
+      return true;
+    }
+
+    return new Error(errorMessage);
   }
 
   canPlay(playerId, card) {

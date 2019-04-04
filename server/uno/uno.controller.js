@@ -26,7 +26,15 @@ class UnoController {
     const {gameId, playerName} = req.body;
     const game = this.games[gameId];
 
-    if(!game.canJoin(playerName)) return res.send({});
+    if(!game) {
+      return res.status(400).send({error: 'Invalid game ID'});
+    }
+
+    const validJoin = game.canJoin(playerName);
+
+    if(validJoin instanceof Error) {
+      return res.status(400).send({error: validJoin.message});
+    }
 
     const player = game.addPlayer(playerName);
     const participants = game.participantsState();
