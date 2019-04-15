@@ -1,0 +1,118 @@
+
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Socket.IO - Demo</title>
+</head>
+<body>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js"></script>
+<script>
+
+const url = 'http://localhost:3500/uno';
+let game = null;
+let player = null;
+let socket = null;
+
+demo();
+
+function demo() {
+  createGame()
+    .then(data => {
+      game = data;
+      console.log('Game created', game);
+
+      return addPlayer(game.gameId, makeId(5));
+    })
+    .then(data => {
+      player = data.player;
+      const {participants} = data.game;
+
+      console.log('Player created', player);
+      console.log('Participants', participants);
+
+      connectSocket(game.gameId);
+      
+      return playerReady(game.gameId, player.playerId);
+    })
+    .then(data => {
+      player = data;
+      console.log('Player ready', player);
+    });
+}
+
+function takeCard() {
+  socket.emit('take-card', player.playerId);
+}
+
+function playCard(color, symbol) {
+  let data = {
+    playerId: player.playerId,
+    card: {color, symbol}
+  }
+
+  socket.emit('play-card', data);
+}
+
+function connectSocket(gameId) {
+  console.log('connecting to socket', gameId);
+  socket = io(`http://localhost:3500/${gameId}`);
+
+  socket.on(gameId, console.log);
+  socket.on('count-down', console.log);
+  socket.on(player.playerId, data => {
+    console.log(data);
+    for(let card of data.player.cards) {
+      console.log(card);
+    }
+    console.log('Cards', data.player.cards.length);
+    console.log('desk', data.game.desk.discard);
+    console.log('turn', data.player.turn);
+  });
+}
+
+function post(path, data) {
+  return fetch(url+path, {
+    method: 'POST',
+    body: JSON.stringify(data),
+    headers:{'Content-Type': 'application/json'}
+  })
+  .then(res => res.json());
+}
+
+function createGame() {
+  const path = '/new';
+
+  return post(path, {});
+}
+
+function addPlayer(gameId, playerName) {
+  const path = '/player';
+  const data = {gameId, playerName};
+console.log(data);
+  return post(path, data);
+}
+
+function playerReady(gameId, playerId) {
+  const path = '/player/ready';
+  const data = {gameId, playerId};
+
+  return post(path, data);
+}
+
+function makeId(len) {
+  var text = "";
+  var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+  for (var i = 0; i < len; i++)
+    text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+  return text;
+}
+
+</script>
+
+</body>
+</html>

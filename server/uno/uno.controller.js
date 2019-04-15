@@ -1,22 +1,55 @@
+const Uno = require('./../service/classes/uno');
+
 class UnoController {
-  createNewGame() {
+  constructor() {
+    this.games = {};
 
+    this.createGame = this.createGame.bind(this);
+    this.addPlayer = this.addPlayer.bind(this);
+    this.playerReady = this.playerReady.bind(this);
   }
 
-  joinGame() {
-
-  }
-
-  playerReady() {
-
-  }
-
-  playerSkip() {
-
-  }
-
-  playerMove() {
+  createGame(req, res) {
+    let {gameId, randomizePlayers} = req.body;
+    // create a game with given ID or a new game
+    let game = new Uno(gameId, randomizePlayers);
     
+    // this line is needed if no gameId is passed in the request
+    gameId = game.id;
+    // if this ID is used by any game then use that game
+    this.games[gameId] = this.games[gameId] || game;
+
+    res.send({gameId});
+  }
+
+  addPlayer(req, res) {
+    const {gameId, playerName} = req.body;
+    const game = this.games[gameId];
+
+    if(!game) {
+      return res.status(400).send({error: 'Invalid game ID'});
+    }
+
+    const validJoin = game.canJoin(playerName);
+
+    if(validJoin instanceof Error) {
+      return res.status(400).send({error: validJoin.message});
+    }
+
+    const player = game.addPlayer(playerName);
+    const participants = game.participantsState();
+
+    res.send({player: player.json(), game: {participants, gameId}});
+  }
+
+  playerReady(req, res) {
+    let {gameId, playerId} = req.body;
+    let game = this.games[gameId];
+    let player = game.playerReady(playerId);
+
+    game.start();
+
+    res.send(player.json());
   }
 };
 
