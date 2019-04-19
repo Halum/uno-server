@@ -10,9 +10,9 @@ class UnoController {
   }
 
   createGame(req, res) {
-    let {gameId, randomizePlayers} = req.body;
+    let {gameId, randomizePlayers, progressiveUno} = req.body;
     // create a game with given ID or a new game
-    let game = new Uno(gameId, randomizePlayers);
+    let game = new Uno(gameId, randomizePlayers, progressiveUno);
     
     // this line is needed if no gameId is passed in the request
     gameId = game.id;

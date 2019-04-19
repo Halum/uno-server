@@ -30,13 +30,13 @@ class CardDeck {
     this.discardPile.push(...this.deck.splice(validCardPos, 1));
   }
 
-  canPlay(card) {
+  canPlay(card, progressiveUno = false) {
     const deskCard = this.discardPile[ this.discardPile.length - 1 ];
-    // what if desk has any wild cards
-
-    if(this.stack.length &&  this.penaltyCards.includes(deskCard.symbol)) {
+    
+    if(this.stack.length) {
       // there are 2+/4+ cards in the stack, so player must play the same symbol
-      return deskCard.symbol === card.symbol;
+      // also only for progressiveUno, player can stack penalty cards
+      return deskCard.symbol === card.symbol && progressiveUno;
     }
 
     return (card.color === deskCard.color || card.symbol === deskCard.symbol || this.wildTypes.includes(card.symbol));

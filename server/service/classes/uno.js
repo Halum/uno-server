@@ -5,12 +5,13 @@ const randomStringGenerator = require('randomstring');
 const shuffle = require('shuffle-array');
 
 class Uno {
-  constructor(gameId, randomizePlayers = false) {
+  constructor(gameId, randomizePlayers = false, progressiveUno = false) {
     this.id = gameId || randomStringGenerator.generate({length: 10, capitalization: 'lowercase'});
     this.currentPlayerIdx = 0;
     this.deck = new CardDeck();
     this.direction = 1;
     this.players = [];
+    this.progressiveUno = progressiveUno;
     this.ranking = [];
     this.randomizePlayers = randomizePlayers;
     this.status = 'waiting';
@@ -96,7 +97,7 @@ class Uno {
     const player = this.getCurrentPlayer();
     const isValidPlayer = player.id === playerId;
     const isValidCard = card ? player.canPlay(card) : true;
-    const isValidPlay = card ? this.deck.canPlay(card) : true;
+    const isValidPlay = card ? this.deck.canPlay(card, this.progressiveUno) : true;
 
     console.log('canPlay', playerId, card, isValidPlayer, isValidCard, isValidPlay);
 
