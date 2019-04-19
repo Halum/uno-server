@@ -68,7 +68,17 @@ class Uno {
 
   callUno(playerId) {
     const player = this.getPlayer(playerId);
-    player.callUno(this.canPlay(playerId));
+    const playersTurn = this.canPlay(playerId);
+
+    console.log('callUno', playerId);
+
+    if(player.isEarlyForUno()) {
+      console.log('callUno', 'isEarlyForUno', playerId);
+      for(let i of Array(2)) this.deck.give(player);
+      return this.broadcastGameState();
+    }
+
+    player.callUno(playersTurn);
 
     if(player.isUno()) {
       this.broadcastParticipants();
