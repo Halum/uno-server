@@ -7,7 +7,7 @@ class CardDeck {
                   '2+', 'skip', 'reverse'];
     this.wildTypes = ['wild', '4+'];
     this.penaltyCards = ['2+', '4+'];
-    this.skipCards = ['skip', ...this.penaltyCards];
+    this.skipCards = ['skip'];
     this.deck = [];
     this.discardPile = [];
 
