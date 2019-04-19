@@ -54,6 +54,10 @@ class Player {
     }
   }
 
+  isEarlyForUno() {
+    return this.cards.length > 2;
+  }
+
   isGameComplete() {
     return this.status === 'complete';
   }

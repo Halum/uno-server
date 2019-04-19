@@ -68,7 +68,17 @@ class Uno {
 
   callUno(playerId) {
     const player = this.getPlayer(playerId);
-    player.callUno(this.canPlay(playerId));
+    const playersTurn = this.canPlay(playerId);
+
+    console.log('callUno', playerId);
+
+    if(player.isEarlyForUno()) {
+      console.log('callUno', 'isEarlyForUno', playerId);
+      for(let i of Array(2)) this.deck.give(player);
+      return this.broadcastGameState();
+    }
+
+    player.callUno(playersTurn);
 
     if(player.isUno()) {
       this.broadcastParticipants();
@@ -124,6 +134,18 @@ class Uno {
     return Promise.reject('Some players are not ready');
   }
 
+  claimUno(playerName) {
+    const player = this.players.find(item => item.name === playerName);
+
+    console.log('claimUno', playerName);
+
+    if(player.isValidForPenalty()) {
+      console.log('claimUno', 'success', playerName);
+      for(let i of Array(2)) this.deck.give(player);
+      this.broadcastGameState();
+    }
+  }
+
   gameOver() {
     this.status = 'complete';
     this.broadcastGameState();
@@ -176,8 +198,7 @@ class Uno {
     if(player.isValidForPenalty()) {
       // next player did not call uno, so give him two cards as penalty
       console.log('playCard UNO penalty', playerId, player.name, card);
-      this.takeCard(playerId, 2);
-      return this.broadcastGameState();
+      return this.takeCard(playerId, 2);
     }
 
     player.give(this.deck, card);
@@ -273,7 +294,8 @@ class Uno {
     if(takeForStacked) {
       // player will taked tolat number of cards that stacked wild cards demands
       // also if it is a time penalty, then he will get one extra
-      totalTake = takeForStacked + (timePenalty ? 1 : 0);
+      // also will get UNO penalty, when toalTake is 2, its coming from UNO penalty
+      totalTake = takeForStacked + (timePenalty ? 1 : 0) + (totalTake === 2 ? 2 : 0);
       this.deck.clearStack();
       console.log('takeCard', 'From stack', totalTake);
     }    
