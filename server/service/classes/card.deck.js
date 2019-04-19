@@ -7,9 +7,10 @@ class CardDeck {
                   '2+', 'skip', 'reverse'];
     this.wildTypes = ['wild', '4+'];
     this.penaltyCards = ['2+', '4+'];
-    this.skipCards = ['skip', ...this.penaltyCards];
+    this.skipCards = ['skip'];
     this.deck = [];
     this.discardPile = [];
+    this.stack = [];
 
     this.generate();
     this.shuffle();
@@ -19,16 +20,34 @@ class CardDeck {
     this.discardPile.push(card);
   }
 
+  addToStack(card) {
+    this.stack.push(card);
+  }
+
   begin() {
     // remember that 'wild' is valid for first round, may want to update later
     const validCardPos = this.deck.findIndex(card => !this.wildTypes.includes(card.symbol));
     this.discardPile.push(...this.deck.splice(validCardPos, 1));
   }
 
-  canPlay(card) {
+  canPlay(card, progressiveUno = false) {
     const deskCard = this.discardPile[ this.discardPile.length - 1 ];
-    // what if desk has any wild cards
+    
+    if(this.stack.length) {
+      // there are 2+/4+ cards in the stack, so player must play the same symbol
+      // also only for progressiveUno, player can stack penalty cards
+      return deskCard.symbol === card.symbol && progressiveUno;
+    }
+
     return (card.color === deskCard.color || card.symbol === deskCard.symbol || this.wildTypes.includes(card.symbol));
+  }
+
+  cardCountForStack() {
+    return this.stack.reduce((acc, card) => acc + parseInt(card.symbol), 0);
+  }
+
+  clearStack() {
+    this.stack = [];
   }
 
   createCard(color, symbol) {
@@ -82,7 +101,11 @@ class CardDeck {
   }
 
   give(player) {
-    player.addCard(this.deck.pop());
+    if(this.deck.length) {
+      player.addCard(this.deck.pop());
+    } else {
+      console.error('There is no card in deck');
+    }
     // the deck must have at least 4 cards so when a 4+ is played, then it doesn't crash
     if(this.deck.length < 5) this.recycleCards();
   }

@@ -5,12 +5,13 @@ const randomStringGenerator = require('randomstring');
 const shuffle = require('shuffle-array');
 
 class Uno {
-  constructor(gameId, randomizePlayers = false) {
+  constructor(gameId, randomizePlayers = false, progressiveUno = false) {
     this.id = gameId || randomStringGenerator.generate({length: 10, capitalization: 'lowercase'});
     this.currentPlayerIdx = 0;
     this.deck = new CardDeck();
     this.direction = 1;
     this.players = [];
+    this.progressiveUno = progressiveUno;
     this.ranking = [];
     this.randomizePlayers = randomizePlayers;
     this.status = 'waiting';
@@ -96,7 +97,7 @@ class Uno {
     const player = this.getCurrentPlayer();
     const isValidPlayer = player.id === playerId;
     const isValidCard = card ? player.canPlay(card) : true;
-    const isValidPlay = card ? this.deck.canPlay(card) : true;
+    const isValidPlay = card ? this.deck.canPlay(card, this.progressiveUno) : true;
 
     console.log('canPlay', playerId, card, isValidPlayer, isValidCard, isValidPlay);
 
@@ -201,10 +202,10 @@ class Uno {
 
     if(result.nexPlayerTake) {
       // as next player must take cards from deck
-      // make him next palyer and force him to take cards
-      this.nextPlayer();
-      const player = this.getCurrentPlayer();
-      return this.takeCard(player.id, result.nexPlayerTake);
+      // add this card to stack
+
+      console.log('Stacking', card);
+      this.deck.addToStack(card);
     }
 
     this.nextPlayer(result.increament);
@@ -266,13 +267,23 @@ class Uno {
     console.log('takeCard valid', playerId, totalTake, timePenalty);
 
     const player = this.getPlayer(playerId);
+    const takeForStacked = this.deck.cardCountForStack();
+    console.log('takeCard', 'takeForStacked', takeForStacked);
+
+    if(takeForStacked) {
+      // player will taked tolat number of cards that stacked wild cards demands
+      // also if it is a time penalty, then he will get one extra
+      totalTake = takeForStacked + (timePenalty ? 1 : 0);
+      this.deck.clearStack();
+      console.log('takeCard', 'From stack', totalTake);
+    }    
 
     for(let i of Array(totalTake)) this.deck.give(player);
 
     if(totalTake !== 1 || timePenalty) {
       // player did not take by will, so someone feed him 2+/4+
       // we need to skip current player and move to next player
-      // Or player gotr a time penalty so can't play penalty card
+      // Or player got a time penalty so can't play penalty card
       console.log('takeCard', 'nextPlayer', playerId, totalTake, timePenalty);
       this.nextPlayer();
     } else {
@@ -290,7 +301,7 @@ class Uno {
 
   timesUp(playerId) {
     if(this.canSkip(playerId)) {
-      // player taken a card but not player, so skip his playing
+      // player taken a card but not played, so skip his playing
       this.skipCard(playerId);
     } else {
       // give the player a penalty
