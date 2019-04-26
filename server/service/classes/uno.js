@@ -12,7 +12,7 @@ class Uno {
     this.direction = 1;
     this.players = [];
     this.progressiveUno = progressiveUno;
-    this.ranking = [];
+    this.rankedPlayers = [];
     this.randomizePlayers = randomizePlayers;
     this.status = 'waiting';
 
@@ -38,12 +38,12 @@ class Uno {
       ? {} 
       : this.getCurrentPlayer();
     const direction = this.direction;
-    const ranking = this.ranking.map(player => player.summary());
+    const ranking = this.rankedPlayers.map(player => player.summary());
     const status = this.status;
 
     // need to broadcast to both running players and ranking players
     // TODO ranking player does not need everything to broadcasted
-    for(let player of [...this.players, ...this.ranking]) {
+    for(let player of [...this.players, ...this.rankedPlayers]) {
       const participants = this.participantsState(player);
       let turn = currentPlayer.id === player.id;
       let state = {
@@ -59,7 +59,7 @@ class Uno {
   }
 
   broadcastParticipants() {
-    for(let player of [...this.players, ...this.ranking]) {
+    for(let player of [...this.players, ...this.rankedPlayers]) {
       const participants = this.participantsState(player);
 
       socketService.broadcast(this.id, player.id, {game: {participants}});
@@ -163,7 +163,7 @@ class Uno {
 
   getPlayer(playerId) {
     console.log('getPlayer', playerId);
-    return [...this.players, ...this.ranking].find(player => player.id === playerId);
+    return [...this.players, ...this.rankedPlayers].find(player => player.id === playerId);
   }
 
   getPlayerByName(playerName) {
@@ -270,7 +270,7 @@ class Uno {
   }
 
   get playerCount() {
-    return this.players.length + this.ranking.length;
+    return this.players.length + this.rankedPlayers.length;
   }
 
   playerReady(playerId) {
@@ -282,7 +282,7 @@ class Uno {
 
   rankPlayer(player) {
     this.players = this.players.filter(val => !val.isGameComplete());
-    this.ranking.push(player);
+    this.rankedPlayers.push(player);
   }
 
   removePlayer(player) {

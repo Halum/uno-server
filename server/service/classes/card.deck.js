@@ -8,7 +8,7 @@ class CardDeck {
     this.wildTypes = ['wild', '4+'];
     this.penaltyCards = ['2+', '4+'];
     this.skipCards = ['skip'];
-    this.deck = [];
+    this.cards = [];
     this.discardPile = [];
     this.stack = [];
 
@@ -26,8 +26,8 @@ class CardDeck {
 
   begin() {
     // remember that 'wild' is valid for first round, may want to update later
-    const validCardPos = this.deck.findIndex(card => !this.wildTypes.includes(card.symbol));
-    this.discardPile.push(...this.deck.splice(validCardPos, 1));
+    const validCardPos = this.cards.findIndex(card => !this.wildTypes.includes(card.symbol));
+    this.discardPile.push(...this.cards.splice(validCardPos, 1));
   }
 
   canPlay(card, progressiveUno = false) {
@@ -57,14 +57,14 @@ class CardDeck {
   generate() {
     for(let suit of this.suits) {
       for(let type of this.types) {
-        this.deck.push(this.createCard(suit, type));
-        if(type !== '0') this.deck.push(this.createCard(suit, type));
+        this.cards.push(this.createCard(suit, type));
+        if(type !== '0') this.cards.push(this.createCard(suit, type));
       }
     }
 
     for(let type of this.wildTypes) {
       for(let i of Array(4)) {
-        this.deck.push(this.createCard('any', type));
+        this.cards.push(this.createCard('any', type));
       }
     }
   }
@@ -84,7 +84,7 @@ class CardDeck {
   }
 
   getForPlayer() {
-    let playerCards = [...this.deck.splice(0, 7)];
+    let playerCards = [...this.cards.splice(0, 7)];
 
     return playerCards;
   }
@@ -95,40 +95,40 @@ class CardDeck {
 
   get state() {
     return {
-      deck: this.deck.length,
+      deck: this.cards.length,
       discard: this.discardPile[ this.discardPile.length - 1 ]
     }
   }
 
   give(player) {
-    if(this.deck.length) {
-      player.addCard(this.deck.pop());
+    if(this.cards.length) {
+      player.addCard(this.cards.pop());
     } else {
       console.error('There is no card in deck');
     }
     // the deck must have at least 4 cards so when a 4+ is played, then it doesn't crash
-    if(this.deck.length < 5) this.recycleCards();
+    if(this.cards.length < 5) this.recycleCards();
   }
 
   recycleCards() {
     // move all cards from discard pile to deck excepts for the last one
     // because the last one needs to keep displayed
-    this.deck = this.discardPile;
-    this.discardPile = [this.deck.pop()]
+    this.cards = this.discardPile;
+    this.discardPile = [this.cards.pop()]
     // discard pile might have colored wild card, need to filter them and make proper changes
-    this.deck = this.deck.map(card => {
+    this.cards = this.cards.map(card => {
       if(this.wildTypes.includes(card.symbol)) card.color = 'any';
       return card;
     });
-    shuffle(this.deck);
+    shuffle(this.cards);
   }
 
   shuffle() {
-    shuffle(this.deck);
+    shuffle(this.cards);
   }
 
   takeFromPlayer(cards) {
-    this.deck = [...cards, ...this.deck];
+    this.cards = [...cards, ...this.cards];
   }
 
   static isSame(cardA, cardB) {
