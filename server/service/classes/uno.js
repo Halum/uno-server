@@ -251,7 +251,7 @@ class Uno {
   }
 
   removePlayer(player) {
-    console.log('removePlayer', player);
+    console.log('removePlayer', player.id);
     player.releaseCards(this.deck);
     this.players = this.players.filter(item => item.id !== player.id);
 
