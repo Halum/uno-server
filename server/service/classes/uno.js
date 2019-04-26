@@ -135,7 +135,7 @@ class Uno {
   }
 
   claimUno(playerName) {
-    const player = this.players.find(item => item.name === playerName);
+    const player = this.getPlayerByName(playerName);
 
     console.log('claimUno', playerName);
 
@@ -160,6 +160,11 @@ class Uno {
     return [...this.players, ...this.ranking].find(player => player.id === playerId);
   }
 
+  getPlayerByName(playerName) {
+    console.log('getPlayerByName', playerName);
+    return this.players.find(item => item.name === playerName);
+  }
+
   isGameOverPossible() {
     if(this.players.length === 1) {
       // update last player status
@@ -173,9 +178,24 @@ class Uno {
     return false;
   }
 
-  rankPlayer(player) {
-    this.players = this.players.filter(val => !val.isGameComplete());
-    this.ranking.push(player);
+  kickPlayer({kickerId: playerId, kickedName: playerName}) {
+    console.log('kickPlayer', playerId, playerName);
+    const kickerPlayer = this.getPlayer(playerId);
+    const kickedPlayer = this.getPlayerByName(playerName);
+
+    // kicker and kicked should be valid
+    // when only 2 players, no kicking
+    if(!kickedPlayer || !kickerPlayer || this.playerCount <= 2) return;
+
+    kickedPlayer.kick(playerId);
+    console.log('kickPlayer', playerName, 'kickCount', kickedPlayer.kickCount);
+
+    if((this.playerCount > 3 && kickedPlayer.kickCount >= 3) || (this.playerCount === 3 && kickedPlayer.kickCount >= 2)) {
+      console.log('kickPlayer', 'kicked', playerName);
+      // when total players more than 3 then minimum 3 kick is required
+      // when total players 3 then minimum 2 kick required
+      this.removePlayer(kickedPlayer);
+    }
   }
 
   nextPlayer(increament = 1) {
@@ -243,6 +263,10 @@ class Uno {
     this.broadcastGameState();
   }
 
+  get playerCount() {
+    return this.players.length + this.ranking.length;
+  }
+
   playerReady(playerId) {
     const player = this.getPlayer(playerId);
     player.statusReady();
@@ -250,9 +274,15 @@ class Uno {
     return player;
   }
 
+  rankPlayer(player) {
+    this.players = this.players.filter(val => !val.isGameComplete());
+    this.ranking.push(player);
+  }
+
   removePlayer(player) {
     console.log('removePlayer', player.id);
     player.releaseCards(this.deck);
+    // only active player need to be removed not ranked one
     this.players = this.players.filter(item => item.id !== player.id);
 
     if(this.isGameOverPossible()) {
@@ -325,7 +355,7 @@ class Uno {
       totalTake = takeForStacked + (timePenalty ? 1 : 0) + (totalTake === 2 ? 2 : 0);
       this.deck.clearStack();
       console.log('takeCard', 'From stack', totalTake);
-    }    
+    }
 
     for(let i of Array(totalTake)) this.deck.give(player);
 
