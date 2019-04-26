@@ -99,6 +99,10 @@ class Player {
     this.cards = [];
   }
 
+  resetKick() {
+    this.kickedBy.clear();
+  }
+
   skipCard() {
     this.takenCard = null;
   }

@@ -111,6 +111,12 @@ class Uno {
 
     console.log('canPlay', playerId, card, isValidPlayer, isValidCard, isValidPlay);
 
+    if(isValidPlayer && player.kickCount) {
+      onsole.log('canPlay', 'resetKick', player.id);
+      // as the player is still active, people shouldn't be able to kick him
+      player.resetKick();
+    }
+
     return isValidPlayer && isValidCard && isValidPlay;
   }
 
