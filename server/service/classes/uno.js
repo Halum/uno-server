@@ -156,6 +156,7 @@ class Uno {
   }
 
   getPlayer(playerId) {
+    console.log('getPlayer', playerId);
     return [...this.players, ...this.ranking].find(player => player.id === playerId);
   }
 
@@ -238,6 +239,12 @@ class Uno {
     player.statusReady();
     this.broadcastGameState();
     return player;
+  }
+
+  removePlayer(player) {
+    console.log('removePlayer', player);
+    player.releaseCards(this.deck);
+    this.players = this.players.filter(item => item.id !== player.id);
   }
 
   skipCard(playerId) {

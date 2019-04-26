@@ -85,6 +85,11 @@ class Player {
     return playerData;
   }
 
+  releaseCards(deck) {
+    deck.takeFromPlayer(this.cards);
+    this.cards = [];
+  }
+
   skipCard() {
     this.takenCard = null;
   }
