@@ -156,7 +156,21 @@ class Uno {
   }
 
   getPlayer(playerId) {
+    console.log('getPlayer', playerId);
     return [...this.players, ...this.ranking].find(player => player.id === playerId);
+  }
+
+  isGameOverPossible() {
+    if(this.players.length === 1) {
+      // update last player status
+      this.players[0].gameComplete();
+      // only one player remaing, so move him to the ranking section
+      this.rankPlayer(this.players[0]);
+      
+      return true;
+    }
+
+    return false;
   }
 
   rankPlayer(player) {
@@ -209,11 +223,7 @@ class Uno {
       this.rankPlayer(player);
     }
 
-    if(this.players.length === 1) {
-      // update last player status
-      this.players[0].gameComplete();
-      // only one player remaing, so move him to the ranking section
-      this.rankPlayer(this.players[0]);
+    if(this.isGameOverPossible()) {
       return this.gameOver();
     }
 
@@ -238,6 +248,23 @@ class Uno {
     player.statusReady();
     this.broadcastGameState();
     return player;
+  }
+
+  removePlayer(player) {
+    console.log('removePlayer', player.id);
+    player.releaseCards(this.deck);
+    this.players = this.players.filter(item => item.id !== player.id);
+
+    if(this.isGameOverPossible()) {
+      this.gameOver();
+      return this.broadcastGameState();
+    }
+
+    if(this.currentPlayerIdx === player.id) {
+      this.nextPlayer();
+    }
+
+    this.broadcastGameState();
   }
 
   skipCard(playerId) {

@@ -127,6 +127,10 @@ class CardDeck {
     shuffle(this.deck);
   }
 
+  takeFromPlayer(cards) {
+    this.deck = [...cards, ...this.deck];
+  }
+
   static isSame(cardA, cardB) {
     return cardA.color === cardB.color && cardA.symbol === cardB.symbol;
   }

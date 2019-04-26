@@ -13,4 +13,8 @@ unoRouter
   .route('/player/ready')
   .post(unoController.playerReady);
 
+unoRouter
+  .route('/:gameId/player/:playerId/leave')
+  .delete(unoController.leaveGame);
+
 module.exports = unoRouter;
