@@ -1,6 +1,6 @@
 const CardDeck = require('./card.deck');
 const Player = require('./player');
-const socketService = require('./../socket.service');
+const SocketService = require('./../socket.service');
 const randomStringGenerator = require('randomstring');
 const shuffle = require('shuffle-array');
 
@@ -15,8 +15,7 @@ class Uno {
     this.ranking = [];
     this.randomizePlayers = randomizePlayers;
     this.status = 'waiting';
-
-    socketService.manageGame(this);
+    this.socket = new SocketService(this);
   }
 
   addPlayer(playerName) {
@@ -54,7 +53,7 @@ class Uno {
       console.log('broadcast', player.id, JSON.stringify(state));
       console.log('-------------------------------------------');
 
-      socketService.broadcast(this.id, player.id, state);
+      this.socket.broadcast(player.id, state);
     }
   }
 
@@ -62,7 +61,7 @@ class Uno {
     for(let player of [...this.players, ...this.ranking]) {
       const participants = this.participantsState(player);
 
-      socketService.broadcast(this.id, player.id, {game: {participants}});
+      this.socket.broadcast(player.id, {game: {participants}});
     }
   }
 
@@ -301,7 +300,7 @@ class Uno {
     let channel = 'count-down';
 
     let intervalTimer = setInterval(()=>{
-      socketService.broadcast(this.id, channel, count--);
+      this.socket.broadcast(channel, count--);
       if(count === 0) {
         clearInterval(intervalTimer);
         this.broadcastGameState();

@@ -1,29 +1,29 @@
 const io = require('socket.io');
 
+let socketServer = null;
+
 class SocketService {
-  constructor() {
-    this.socketServer = null;
-    this.namespaces = {};
+  constructor(game) {
+    this.game = game;
+    this.namespace = socketServer.of(game.id);
+
+    this.manageGame();
   }
   
-  init(server) {
-    this.socketServer = this.socketServer || io(server);
+  static init(server) {
+    socketServer = socketServer || io(server);
 
     return Promise.resolve();
   }
 
-  manageGame(game) {
-    let gameId = game.id;
-
-    if(this.namespaces[gameId]) return;
-
-    const gameNamespace = this.socketServer.of(gameId);
-    this.namespaces[gameId] = gameNamespace;
+  manageGame() {
+    const game = this.game;
+    const gameId = this.game.id;
 
     console.log('Managing game', gameId);
-    gameNamespace.on('connection', socket => {
+    this.namespace.on('connection', socket => {
       console.log('Connected to', gameId);
-      gameNamespace.emit(gameId, 'You are connected to '+gameId);
+      this.namespace.emit(gameId, 'You are connected to ' + gameId);
 
       socket.on('take-card', game.takeCard.bind(game));
       socket.on('play-card', game.playCard.bind(game));
@@ -35,11 +35,9 @@ class SocketService {
     });
   }
 
-  broadcast(gameId, channel, data) {
-    const gameNamespace = this.namespaces[gameId];
-
-    gameNamespace.emit(channel, data);
+  broadcast(channel, data) {
+    this.namespace.emit(channel, data);
   }
 };
 
-module.exports = new SocketService();
+module.exports = SocketService;
