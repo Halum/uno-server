@@ -1,8 +1,10 @@
-const CardDeck = require('./card.deck');
-const Player = require('./player');
-const socketService = require('./../socket.service');
 const randomStringGenerator = require('randomstring');
 const shuffle = require('shuffle-array');
+
+const CardDeck = require('./card.deck');
+const History = require('./../classes/history');
+const Player = require('./player');
+const SocketService = require('./../socket.service');
 
 class Uno {
   constructor(gameId, randomizePlayers = false, progressiveUno = false) {
@@ -15,8 +17,8 @@ class Uno {
     this.rankedPlayers = [];
     this.randomizePlayers = randomizePlayers;
     this.status = 'waiting';
-
-    socketService.manageGame(this);
+    this.socket = new SocketService(this);
+    this.history = new History(this.id, this.socket);
   }
 
   addPlayer(playerName) {
@@ -24,7 +26,10 @@ class Uno {
 
     this.players.push(newPlayer);
     this.broadcastGameState();
-    
+
+    // update history
+    this.history.playerJoined(newPlayer.name);
+
     return newPlayer;
   }
 
@@ -54,7 +59,7 @@ class Uno {
       console.log('broadcast', player.id, JSON.stringify(state));
       console.log('-------------------------------------------');
 
-      socketService.broadcast(this.id, player.id, state);
+      this.socket.broadcast(player.id, state);
     }
   }
 
@@ -62,7 +67,7 @@ class Uno {
     for(let player of [...this.players, ...this.rankedPlayers]) {
       const participants = this.participantsState(player);
 
-      socketService.broadcast(this.id, player.id, {game: {participants}});
+      this.socket.broadcast(player.id, {game: {participants}});
     }
   }
 
@@ -71,9 +76,13 @@ class Uno {
     const playersTurn = this.canPlay(playerId);
 
     console.log('callUno', playerId);
+    // update history
+    this.history.calledUno(player.name);
 
     if(player.isEarlyForUno()) {
       console.log('callUno', 'isEarlyForUno', playerId);
+      // update history
+      this.history.calledUnoEarly(player.name);
       for(let i of Array(2)) this.deck.give(player);
       return this.broadcastGameState();
     }
@@ -92,8 +101,8 @@ class Uno {
       errorMessage = 'Game has already began';
     } else if(this.status === 'complete') {
       errorMessage = 'Game is complete';
-    } else if(playerName.length > 12) {
-      errorMessage = 'Player name should be max 12 characters';
+    } else if(playerName.length > 12 || playerName.length < 3) {
+      errorMessage = 'Player name should be between 3 to 12 characters';
     } else if( this.players.some(player => player.name.toLowerCase() === playerName.toLowerCase()) ) {
       errorMessage = 'Duplicate name is not allowed';
     } else {
@@ -149,12 +158,18 @@ class Uno {
       console.log('claimUno', 'success', playerName);
       for(let i of Array(2)) this.deck.give(player);
       this.broadcastGameState();
+
+      // update history
+      this.history.claimedUno(playerName);
     }
   }
 
   gameOver() {
     this.status = 'complete';
     this.broadcastGameState();
+
+    // update history
+    this.history.gameOver();
   }
 
   getCurrentPlayer() {
@@ -194,6 +209,9 @@ class Uno {
     if(!kickedPlayer || !kickerPlayer || this.playerCount <= 2) return;
 
     kickedPlayer.kick(playerId);
+    
+    // update history
+    history.kickedPlayer(kickerPlayer.name, kickedPlayer.name);
     console.log('kickPlayer', playerName, 'kickCount', kickedPlayer.kickCount);
 
     if((this.playerCount > 3 && kickedPlayer.kickCount >= 3) || (this.playerCount === 3 && kickedPlayer.kickCount >= 2)) {
@@ -201,6 +219,9 @@ class Uno {
       // when total players more than 3 then minimum 3 kick is required
       // when total players 3 then minimum 2 kick required
       this.removePlayer(kickedPlayer);
+
+      // update history
+      this.history.kickSuccess(kickedPlayer.name);
     }
   }
 
@@ -212,6 +233,9 @@ class Uno {
     if(this.currentPlayerIdx < 0) this.currentPlayerIdx += this.players.length;
 
     this.currentPlayerIdx %= this.players.length;
+
+    // update history
+    this.history.movedToNextPlayer(this.getCurrentPlayer().name);
   }
 
   participantsState(forPlayer = {}) {
@@ -238,10 +262,16 @@ class Uno {
     if(player.isValidForPenalty()) {
       // next player did not call uno, so give him two cards as penalty
       console.log('playCard UNO penalty', playerId, player.name, card);
+
+      // update history
+      this.history.gotUnoPenalty(player.name);
+
       return this.takeCard(playerId, 2);
     }
 
     player.give(this.deck, card);
+    // update history
+    this.history.cardPlayed(player.name, card);
 
     if(player.isGameComplete()) {
       // this player is done with the game, move him to the ranking section
@@ -257,12 +287,20 @@ class Uno {
 
     this.direction *= result.direction;
 
+    if(result.direction === -1) {
+      // update history
+      this.history.directionChanged(this.direction);
+    }
+
     if(result.nexPlayerTake) {
       // as next player must take cards from deck
       // add this card to stack
 
       console.log('Stacking', card);
       this.deck.addToStack(card);
+
+      // update history
+      this.history.nextPlayerTake(this.deck.cardCountForStack());
     }
 
     this.nextPlayer(result.increament);
@@ -277,12 +315,19 @@ class Uno {
     const player = this.getPlayer(playerId);
     player.statusReady();
     this.broadcastGameState();
+
+    // update history
+    this.history.playerReady(player.name);
+
     return player;
   }
 
   rankPlayer(player) {
     this.players = this.players.filter(val => !val.isGameComplete());
     this.rankedPlayers.push(player);
+
+    // update history
+    this.history.playerRanked(player.name, this.rankedPlayers.length);
   }
 
   removePlayer(player) {
@@ -290,6 +335,9 @@ class Uno {
     player.releaseCards(this.deck);
     // only active player need to be removed not ranked one
     this.players = this.players.filter(item => item.id !== player.id);
+
+    // update history
+    this.history.playerLeft(player.name);
 
     if(this.isGameOverPossible()) {
       this.gameOver();
@@ -309,6 +357,9 @@ class Uno {
 
     const player = this.getPlayer(playerId);
     player.skipCard();
+    // update history
+    this.history.cardSkipped(this.getPlayer(playerId).name);
+
     console.log('skipCard', playerId, 'player skipped');
     // player skipped, move onto next player
     this.nextPlayer();
@@ -337,7 +388,7 @@ class Uno {
     let channel = 'count-down';
 
     let intervalTimer = setInterval(()=>{
-      socketService.broadcast(this.id, channel, count--);
+      this.socket.broadcast(channel, count--);
       if(count === 0) {
         clearInterval(intervalTimer);
         this.broadcastGameState();
@@ -361,9 +412,15 @@ class Uno {
       totalTake = takeForStacked + (timePenalty ? 1 : 0) + (totalTake === 2 ? 2 : 0);
       this.deck.clearStack();
       console.log('takeCard', 'From stack', totalTake);
+
+      // update history
+      this.history.gotWildForceTake(player.name, takeForStacked);
     }
 
     for(let i of Array(totalTake)) this.deck.give(player);
+
+    // update history
+    this.history.tookCard(player.name, totalTake);
 
     if(totalTake !== 1 || timePenalty) {
       // player did not take by will, so someone feed him 2+/4+
@@ -385,10 +442,16 @@ class Uno {
   }
 
   timesUp(playerId) {
+    const player = this.getPlayer(playerId);
+    // update history
+    this.history.playerTimesUp(player.name)
+
     if(this.canSkip(playerId)) {
       // player taken a card but not played, so skip his playing
       this.skipCard(playerId);
     } else {
+      // update history
+      this.history.gotTimePenalty(player.name);
       // give the player a penalty
       this.takeCard(playerId, 1, true);
     }
@@ -402,6 +465,8 @@ class Uno {
 
     player.visiting = playerName;
     this.broadcastParticipants();
+    // update history
+    this.history.viewingCards(player.name, playerName);
   }
 }
 
