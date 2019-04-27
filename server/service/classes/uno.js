@@ -167,6 +167,9 @@ class Uno {
   gameOver() {
     this.status = 'complete';
     this.broadcastGameState();
+
+    // update history
+    this.history.gameOver();
   }
 
   getCurrentPlayer() {
@@ -206,6 +209,9 @@ class Uno {
     if(!kickedPlayer || !kickerPlayer || this.playerCount <= 2) return;
 
     kickedPlayer.kick(playerId);
+    
+    // update history
+    history.kickedPlayer(kickerPlayer.name, kickedPlayer.name);
     console.log('kickPlayer', playerName, 'kickCount', kickedPlayer.kickCount);
 
     if((this.playerCount > 3 && kickedPlayer.kickCount >= 3) || (this.playerCount === 3 && kickedPlayer.kickCount >= 2)) {
@@ -213,6 +219,9 @@ class Uno {
       // when total players more than 3 then minimum 3 kick is required
       // when total players 3 then minimum 2 kick required
       this.removePlayer(kickedPlayer);
+
+      // update history
+      this.history.kickSuccess(kickedPlayer.name);
     }
   }
 
@@ -224,6 +233,9 @@ class Uno {
     if(this.currentPlayerIdx < 0) this.currentPlayerIdx += this.players.length;
 
     this.currentPlayerIdx %= this.players.length;
+
+    // update history
+    this.history.movedToNextPlayer(this.getCurrentPlayer().name);
   }
 
   participantsState(forPlayer = {}) {
@@ -250,10 +262,16 @@ class Uno {
     if(player.isValidForPenalty()) {
       // next player did not call uno, so give him two cards as penalty
       console.log('playCard UNO penalty', playerId, player.name, card);
+
+      // update history
+      this.history.gotUnoPenalty(player.name);
+
       return this.takeCard(playerId, 2);
     }
 
     player.give(this.deck, card);
+    // update history
+    this.history.cardPlayed(player.name, card);
 
     if(player.isGameComplete()) {
       // this player is done with the game, move him to the ranking section
@@ -267,7 +285,11 @@ class Uno {
 
     const result = this.deck.getPlayResult(card, this.players.length);
 
-    this.direction *= result.direction;
+    if(this.direction !== result.direction) {
+      this.direction *= result.direction;
+      // update history
+      this.history.directionChanged(this.direction);
+    }
 
     if(result.nexPlayerTake) {
       // as next player must take cards from deck
@@ -275,6 +297,9 @@ class Uno {
 
       console.log('Stacking', card);
       this.deck.addToStack(card);
+
+      // update history
+      this.history.nextPlayerTake(this.deck.cardCountForStack());
     }
 
     this.nextPlayer(result.increament);
@@ -295,6 +320,9 @@ class Uno {
   rankPlayer(player) {
     this.players = this.players.filter(val => !val.isGameComplete());
     this.rankedPlayers.push(player);
+
+    // update history
+    this.history.playerRanked(player.name, this.rankedPlayers.length);
   }
 
   removePlayer(player) {
