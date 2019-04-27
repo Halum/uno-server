@@ -101,8 +101,8 @@ class Uno {
       errorMessage = 'Game has already began';
     } else if(this.status === 'complete') {
       errorMessage = 'Game is complete';
-    } else if(playerName.length > 12) {
-      errorMessage = 'Player name should be max 12 characters';
+    } else if(playerName.length > 12 || playerName.length < 3) {
+      errorMessage = 'Player name should be between 3 to 12 characters';
     } else if( this.players.some(player => player.name.toLowerCase() === playerName.toLowerCase()) ) {
       errorMessage = 'Duplicate name is not allowed';
     } else {
@@ -285,8 +285,9 @@ class Uno {
 
     const result = this.deck.getPlayResult(card, this.players.length);
 
-    if(this.direction !== result.direction) {
-      this.direction *= result.direction;
+    this.direction *= result.direction;
+
+    if(result.direction === -1) {
       // update history
       this.history.directionChanged(this.direction);
     }
