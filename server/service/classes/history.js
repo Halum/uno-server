@@ -7,7 +7,7 @@ class History {
 
   add(item) {
     this.timeline.push(item);
-    this.socket.broadcast(this.gameId, item);
+    this.socket.broadcast('notification', item);
   }
 
   calledUno(playerName) {
