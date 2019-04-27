@@ -32,6 +32,7 @@ class SocketService {
       socket.on('call-uno', game.callUno.bind(game));
       socket.on('view-cards', game.viewCards.bind(game));
       socket.on('claim-uno', game.claimUno.bind(game));
+      socket.on('kick-player', game.kickPlayer.bind(game));
     });
   }
 

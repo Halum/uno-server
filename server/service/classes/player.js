@@ -5,6 +5,7 @@ class Player {
   constructor(name, cards) {
     this.id = randomStringGenerator.generate({length: 10, capitalization: 'lowercase'});
     this.cards = cards;
+    this.kickedBy = new Set();
     this.name = name;
     this.status = 'waiting';
     this.takenCard = null;
@@ -85,9 +86,21 @@ class Player {
     return playerData;
   }
 
+  kick(kickerPlayerId) {
+    this.kickedBy.add(kickerPlayerId);
+  }
+
+  get kickCount() {
+    return this.kickedBy.size;
+  }
+
   releaseCards(deck) {
     deck.takeFromPlayer(this.cards);
     this.cards = [];
+  }
+
+  resetKick() {
+    this.kickedBy.clear();
   }
 
   skipCard() {
