@@ -1,8 +1,10 @@
-const CardDeck = require('./card.deck');
-const Player = require('./player');
-const SocketService = require('./../socket.service');
 const randomStringGenerator = require('randomstring');
 const shuffle = require('shuffle-array');
+
+const CardDeck = require('./card.deck');
+const History = require('./../classes/history');
+const Player = require('./player');
+const SocketService = require('./../socket.service');
 
 class Uno {
   constructor(gameId, randomizePlayers = false, progressiveUno = false) {
@@ -16,6 +18,7 @@ class Uno {
     this.randomizePlayers = randomizePlayers;
     this.status = 'waiting';
     this.socket = new SocketService(this);
+    this.history = new History(this.id, this.socket);
   }
 
   addPlayer(playerName) {
@@ -23,7 +26,10 @@ class Uno {
 
     this.players.push(newPlayer);
     this.broadcastGameState();
-    
+
+    // update history
+    this.history.playerJoined(newPlayer.name);
+
     return newPlayer;
   }
 
@@ -70,9 +76,13 @@ class Uno {
     const playersTurn = this.canPlay(playerId);
 
     console.log('callUno', playerId);
+    // update history
+    this.history.calledUno(player.name);
 
     if(player.isEarlyForUno()) {
       console.log('callUno', 'isEarlyForUno', playerId);
+      // update history
+      this.history.calledUnoEarly(player.name);
       for(let i of Array(2)) this.deck.give(player);
       return this.broadcastGameState();
     }
@@ -142,6 +152,9 @@ class Uno {
       console.log('claimUno', 'success', playerName);
       for(let i of Array(2)) this.deck.give(player);
       this.broadcastGameState();
+
+      // update history
+      this.history.claimedUno(playerName);
     }
   }
 
@@ -254,6 +267,9 @@ class Uno {
     player.releaseCards(this.deck);
     this.players = this.players.filter(item => item.id !== player.id);
 
+    // update history
+    this.history.playerLeft(player.name);
+
     if(this.isGameOverPossible()) {
       this.gameOver();
       return this.broadcastGameState();
@@ -276,6 +292,8 @@ class Uno {
     // player skipped, move onto next player
     this.nextPlayer();
     this.broadcastGameState();
+    // update history
+    this.history.cardSkipped(this.getPlayer(playerId).name);
   }
 
   start() {
@@ -365,6 +383,8 @@ class Uno {
 
     player.visiting = playerName;
     this.broadcastParticipants();
+    // update history
+    this.history.viewingCards(player.name, playerName);
   }
 }
 
