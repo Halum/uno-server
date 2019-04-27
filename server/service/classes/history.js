@@ -42,8 +42,16 @@ class History {
     return this.timeline;
   }
 
+  gotTimePenalty(playerName) {
+    this.add(`${playerName} got 1 card for Time penalty`);
+  }
+
   gotUnoPenalty(playerName) {
     this.add(`${playerName} got 2 cards as UNO penalty`);
+  }
+
+  gotWildForceTake(playerName, cardCount) {
+    this.add(`${playerName} got ${cardCount} cards as previous player played wild draw card`);
   }
 
   kickedPlayer(kickerName, kickedPlayerName) {
@@ -52,6 +60,10 @@ class History {
 
   kickSuccess(kickedPlayerName) {
     this.add(`${kickedPlayerName} has been kicked successfully`);
+  }
+
+  movedToNextPlayer(playerName) {
+    this.add(`${playerName} has got his turn`);
   }
 
   nextPlayerTake(cardCount) {
@@ -70,8 +82,16 @@ class History {
     this.add(`${playerName} has been ranked to ${rank}`);
   }
 
-  movedToNextPlayer(playerName) {
-    this.add(`${playerName} has got his turn`);
+  playerReady(playerName) {
+    this.add(`${playerName} is ready`);
+  }
+
+  playerTimesUp(playerName) {
+    this.add(`${playerName} time's up`);
+  }
+
+  tookCard(playerName, cardCount) {
+    this.add(`${playerName} took total ${cardCount} cards`);
   }
 
   viewingCards(spectator, viewed) {

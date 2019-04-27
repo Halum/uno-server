@@ -314,6 +314,10 @@ class Uno {
     const player = this.getPlayer(playerId);
     player.statusReady();
     this.broadcastGameState();
+
+    // update history
+    this.history.playerReady(player.name);
+
     return player;
   }
 
@@ -352,12 +356,13 @@ class Uno {
 
     const player = this.getPlayer(playerId);
     player.skipCard();
+    // update history
+    this.history.cardSkipped(this.getPlayer(playerId).name);
+
     console.log('skipCard', playerId, 'player skipped');
     // player skipped, move onto next player
     this.nextPlayer();
     this.broadcastGameState();
-    // update history
-    this.history.cardSkipped(this.getPlayer(playerId).name);
   }
 
   start() {
@@ -406,9 +411,15 @@ class Uno {
       totalTake = takeForStacked + (timePenalty ? 1 : 0) + (totalTake === 2 ? 2 : 0);
       this.deck.clearStack();
       console.log('takeCard', 'From stack', totalTake);
+
+      // update history
+      this.history.gotWildForceTake(player.name, takeForStacked);
     }
 
     for(let i of Array(totalTake)) this.deck.give(player);
+
+    // update history
+    this.history.tookCard(player.name, totalTake);
 
     if(totalTake !== 1 || timePenalty) {
       // player did not take by will, so someone feed him 2+/4+
@@ -430,10 +441,16 @@ class Uno {
   }
 
   timesUp(playerId) {
+    const player = this.getPlayer(playerId);
+    // update history
+    this.history.playerTimesUp(player.name)
+
     if(this.canSkip(playerId)) {
       // player taken a card but not played, so skip his playing
       this.skipCard(playerId);
     } else {
+      // update history
+      this.history.gotTimePenalty(player.name);
       // give the player a penalty
       this.takeCard(playerId, 1, true);
     }
