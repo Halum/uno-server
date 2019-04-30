@@ -211,7 +211,7 @@ class Uno {
     kickedPlayer.kick(playerId);
     
     // update history
-    history.kickedPlayer(kickerPlayer.name, kickedPlayer.name);
+    this.history.kickedPlayer(kickerPlayer.name, kickedPlayer.name);
     console.log('kickPlayer', playerName, 'kickCount', kickedPlayer.kickCount);
 
     if((this.playerCount > 3 && kickedPlayer.kickCount >= 3) || (this.playerCount === 3 && kickedPlayer.kickCount >= 2)) {
