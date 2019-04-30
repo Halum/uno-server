@@ -11,7 +11,7 @@ This is a server created with [express](https://expressjs.com/) & [socket.io](ht
 - [npm](https://www.npmjs.com/)
 
 #### Install Process
-- Clone porject into working directory.
+- Clone project into working directory.
 - Open a `terminal` in project's `root directory`.
 - Run `npm install` to install necessary dependencies.
 
