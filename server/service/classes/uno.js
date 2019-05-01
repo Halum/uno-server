@@ -173,6 +173,7 @@ class Uno {
   }
 
   getCurrentPlayer() {
+    console.log('getCurrentPlayer', this.currentPlayerIdx);
     return this.players[ this.currentPlayerIdx ];
   }
 
@@ -220,12 +221,17 @@ class Uno {
       // when total players 3 then minimum 2 kick required
       this.removePlayer(kickedPlayer);
 
+      // this type LEFT_GAME is matched with UI type for leaveing game
+      // its not a good design to depend on UI
+      this.socket.broadcast(kickedPlayer.id, {type: 'LEFT_GAME'});
+
       // update history
       this.history.kickSuccess(kickedPlayer.name);
     }
   }
 
   nextPlayer(increament = 1) {
+    console.log('nextPlayer', increament);
     if(this.direction < 0) increament *= -1 ;
 
     this.currentPlayerIdx += increament;
@@ -233,6 +239,8 @@ class Uno {
     if(this.currentPlayerIdx < 0) this.currentPlayerIdx += this.players.length;
 
     this.currentPlayerIdx %= this.players.length;
+
+    console.log('nextPlayer', 'currentPlayerIdx', this.currentPlayerIdx);
 
     // update history
     this.history.movedToNextPlayer(this.getCurrentPlayer().name);
@@ -333,6 +341,7 @@ class Uno {
   removePlayer(player) {
     console.log('removePlayer', player.id);
     player.releaseCards(this.deck);
+    const playerIndex = this.players.findIndex(item => item.id === player.id);
     // only active player need to be removed not ranked one
     this.players = this.players.filter(item => item.id !== player.id);
 
@@ -340,12 +349,19 @@ class Uno {
     this.history.playerLeft(player.name);
 
     if(this.isGameOverPossible()) {
+      console.log('removePlayer', 'isGameOverPossible');
       this.gameOver();
       return this.broadcastGameState();
     }
 
     if(this.currentPlayerIdx === player.id) {
+      console.log('removePlayer', 'currentPlayerIdx === player.id', this.currentPlayerIdx);
       this.nextPlayer();
+    } else if(playerIndex !== -1 && playerIndex < this.currentPlayerIdx) {
+      // adjust current player index
+      // as someone one player is gone from the array
+      this.currentPlayerIdx -= 1;
+      console.log('removePlayer', 'currentPlayerIdx -=1', this.currentPlayerIdx);
     }
 
     this.broadcastGameState();
