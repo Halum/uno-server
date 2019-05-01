@@ -221,6 +221,10 @@ class Uno {
       // when total players 3 then minimum 2 kick required
       this.removePlayer(kickedPlayer);
 
+      // this type LEFT_GAME is matched with UI type for leaveing game
+      // its not a good design to depend on UI
+      this.socket.broadcast(kickedPlayer.id, {type: 'LEFT_GAME'});
+
       // update history
       this.history.kickSuccess(kickedPlayer.name);
     }
