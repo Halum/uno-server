@@ -30,9 +30,11 @@ if(process.env.NODE_ENV === 'production') {
 }
 
 // this is temporary
-app.get('/', (req, res) => {
-  const demoFilePath = path.resolve(__dirname, '../', 'public/demo.html');
-  res.sendFile(demoFilePath);
-});
+// app.get('/', (req, res) => {
+//   const demoFilePath = path.resolve(__dirname, '../', 'public/index.html');
+//   res.sendFile(demoFilePath);
+// });
+
+app.use(express.static(path.join(__dirname, '../public')));
 
 module.exports = app;

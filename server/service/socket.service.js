@@ -16,6 +16,10 @@ class SocketService {
     return Promise.resolve();
   }
 
+  get server() {
+    return socketServer;
+  }
+
   manageGame() {
     const game = this.game;
     const gameId = this.game.id;

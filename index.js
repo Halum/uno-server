@@ -25,12 +25,13 @@ const onError = (error)=> {
 
 const onListen = () => {
   const address = server.address();
-  const msg = typeof address === 'string' ? address : `port ${address.port}`;
+  const msg = typeof address === 'string' ? address : `${address.address}:${address.port}`;
 
   console.log(`server is listening on ${msg}`);
 }
 
 SocketService.init(server);
+require('./webrtc');
 server.listen(port, ip);
 server.on('error', onError);
 server.on('listening', onListen);
