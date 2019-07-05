@@ -14,8 +14,6 @@ server.sockets.on('connection', socket => {
 
   socket.on('message', msg => {
     log('Client said: ', msg);
-    // for a real app, would be room-only (not broadcast)
-    // socket.broadcast.emit('message', message);
     switch(msg.type) {
       case 'candidate':
         socket.broadcast.to(socket.room).emit('message', {
