@@ -105,6 +105,8 @@ class Uno {
       errorMessage = 'Player name should be between 3 to 12 characters';
     } else if( this.players.some(player => player.name.toLowerCase() === playerName.toLowerCase()) ) {
       errorMessage = 'Duplicate name is not allowed';
+    } else if(!/^[a-zA-Z ]+$/gm.test(playerName)) {
+      errorMessage = 'Invalid characters';
     } else {
       return true;
     }
